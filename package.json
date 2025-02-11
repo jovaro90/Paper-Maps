@@ -1,0 +1,23 @@
+{
+  "name": "tfm",
+  "version": "1.0.0",
+  "description": "trabajo fin de master",
+  "main": "index.js",
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "author": "jordi valls",
+  "license": "ISC",
+  "devDependencies": {
+    "ol": "^10.4.0",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0"
+  },
+  "dependencies": {
+    "ol-hashed": "^2.1.0",
+    "ol-layerswitcher": "^4.1.2"
+  }
+}

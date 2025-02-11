@@ -1,0 +1,46 @@
+<!-- link vincula recursos externos al archivo HTML web -->
+    <!-- rel : tipo de archivo vinculado (stylesheet es un CSS) -->
+    <!-- href: URL del archivo que se va a cargar -->
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Using OpenLayers with Vite</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ol/6.13.1/ol.css" />
+    <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.0.0/dist/ol-layerswitcher.css">
+    <link rel="stylesheet" href="/style.css" /> 
+    
+    
+  </head>
+  <body>
+    <div class="container"></div>
+
+     <div class="map" id="map"></div>
+
+    <div id="popup" class="ol-popup">
+      <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+      <div id="popup-content"></div>
+    </div>
+<!--    _______________
+        || Barra de  ||
+        ||_Busqueda__||      
+______________________________________________________________________________________________*/
+ -->
+    <div class="sidebar-container">
+        <div class="sidebar">
+            <!-- Logo -->
+        <img src="https://geoinnova.org/wp-content/themes/genesis-sample/images/brand/geoinnova_web.svg" alt="Logo" class="sidebar-logo"> 
+        <h2>Buscar ubicación</h2>
+        <input type="text" id="searchBox" placeholder="Ingrese una dirección...">
+        <button id="searchBtn">Buscar</button>
+        <div id="searchResults"></div>
+        </div>
+    </div>
+  
+      
+    
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
