@@ -87,50 +87,55 @@ const extendControls = [
         || Barra de  ||
         ||_Busqueda__||      
 ______________________________________________________________________________________________*/
-const searchBox = document.getElementById("searchBox");
-const searchBtn = document.getElementById("searchBtn");
-const searchResults = document.getElementById("searchResults");
+// Cargar el archivo CSV desde el directorio público
+fetch('/buscador.csv')
+  .then(response => response.text())  // Obtener el archivo como texto
+  .then(csvText => {
+    // Usar PapaParse para convertir el texto CSV a un array de objetos JSON
+    Papa.parse(csvText, {
+      header: true,  // el CSV tiene cabecera
+      complete: function(results) {
+        console.log('Datos CSV:', results.data);
+        // Almacenar los datos CSV en una variable global o en el estado
+        window.csvData = results.data;
+      }
+    });
+  })
+  .catch(error => {
+    console.error('Error al cargar el archivo CSV:', error);
+  });
 
-searchBtn.addEventListener("click", () => {
-  const query = searchBox.value.trim();
-  if (query !== "") {
-    searchLocation(query);
-  }
+// Filtrar los datos como antes (basado en las entradas del usuario)
+document.getElementById('searchBtn').addEventListener('click', function() {
+  const location = document.getElementById('searchLocation').value.toLowerCase();
+  const theme = document.getElementById('themeSelect').value.toLowerCase();
+  const year = document.getElementById('yearFilter').value;
+  const keyword = document.getElementById('searchBox').value.toLowerCase();
+  
+  const filteredResults = window.csvData.filter(item => {
+    const matchesLocation = item.ubicacion.toLowerCase().includes(location);
+    const matchesTheme = item.tematica.toLowerCase() === theme;
+    const matchesYear = year ? item.anio === year : true;
+    const matchesKeyword = keyword ? item.descripcion.toLowerCase().includes(keyword) : true;
+    
+    return matchesLocation && matchesTheme && matchesYear && matchesKeyword;
+  });
+
+  // Mostrar los resultados filtrados
+  document.getElementById('resultCount').textContent = `Resultados encontrados: ${filteredResults.length}`;
+  displaySearchResults(filteredResults);
 });
-// para buscar presionando enter:
-searchBox.addEventListener("keypress", (event) => {
-  if (event.key === "Enter") {
-    searchBtn.click();
-  }
-});
-async function searchLocation(query) {
-  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
 
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+function displaySearchResults(results) {
+  const resultsDiv = document.getElementById('searchResults');
+  resultsDiv.innerHTML = ''; // Limpiar resultados anteriores
 
-    if (data.length > 0) {
-      const result = data[0];
-      const lon = parseFloat(result.lon);
-      const lat = parseFloat(result.lat);
-
-      map.getView().animate({
-        center: ol.proj.fromLonLat([lon, lat]),
-        zoom: 15,
-        duration: 1000
-      });
-
-      searchResults.innerHTML = `<p>Ubicación encontrada: ${result.display_name}</p>`;
-    } else {
-      searchResults.innerHTML = `<p>No se encontraron resultados.</p>`;
-    }
-  } catch (error) {
-    console.error("Error al buscar la ubicación:", error);
-    searchResults.innerHTML = `<p>Error al obtener datos.</p>`;
-  }
+  results.forEach(result => {
+    const div = document.createElement('div');
+    div.textContent = `Ubicación: ${result.ubicacion}, Temática: ${result.tematica}, Año: ${result.anio}`;
+    resultsDiv.appendChild(div);
+  });
 }
-
 /*      _______________
         ||   CAPAS   ||
         ||___________||      

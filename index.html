@@ -35,7 +35,9 @@
             <!-- Ubicacion -->
             <h2>Ubicación</h2>
             <input type="text" id="searchLocation" placeholder="Añadir ubicación" />
-    
+            <!--button id="searchBtn" class="styled-button">Buscar</button-->
+            <div id="searchResults"></div> <!-- Mostrar ubicación -->
+
             <!-- Tematica -->
             <h2>Temática</h2>
             <select id="themeSelect">
@@ -45,7 +47,7 @@
     
             <div id="searchResultsTheme"></div>
             <!-- Año -->
-            <h2>Año</h2>
+            <h2>Fecha</h2>
             <input type="number" id="yearFilter" placeholder="Añadir año" />
             <!--- Palabras clave : esto me la lia
                 <h2>Palabra clave</h2>
@@ -68,8 +70,9 @@
             </div>
         </div>
       
-          
-        
+        <!--biblioteca Papaparse para leer y convertir .csv-->  
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+        <!-- vinculo con main.js-->
         <script type="module" src="./main.js"></script>
       </body>
     </html>
