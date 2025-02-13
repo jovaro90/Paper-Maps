@@ -31,11 +31,37 @@ ________________________________________________________________________________
     <div class="sidebar-container">
         <div class="sidebar">
             <!-- Logo -->
-        <img src="https://geoinnova.org/wp-content/themes/genesis-sample/images/brand/geoinnova_web.svg" alt="Logo" class="sidebar-logo"> 
-        <h2>Buscar ubicación</h2>
-        <input type="text" id="searchBox" placeholder="Ingrese una dirección...">
+        
+        <h2>ubicación</h2>
+        <input type="text" id="searchBox" placeholder="Añadir ubicación">
         <button id="searchBtn">Buscar</button>
         <div id="searchResults"></div>
+
+        <h2>Temática</h2>
+        <select id="themeSelect">
+          <option value="urbanismo">Urbanismo</option>
+          <option value="ambiental">Ambiental</option>
+        </select>
+        <button id="searchBtnTheme" class="styled-button">Buscar</button>
+        <div id="searchResultsTheme" class="results-box"></div>
+
+        <div id="searchResultsTheme"></div>
+        <h2>Año</h2>
+        <input type="date" id="searchBox" placeholder="Filtrar por año">
+        <button id="searchBtn">Buscar</button>
+        <div id="searchResults"></div>
+
+        <h2>Palabra clave</h2>
+        <input type="text" id="searchBox" placeholder="Añadir palabra clave">
+        <button id="searchBtn">Buscar</button>
+        <div id="searchResults"></div>
+
+        <h3> </h3>
+        <h3></h3>
+        <img src="https://geoinnova.org/wp-content/themes/genesis-sample/images/brand/geoinnova_web.svg" alt="Logo" class="sidebar-logo">
+        <h3>TFM Sistemas de información Geográfica en código abierto</h3>
+        <h3>Autor: Jordi Valls Roig</h3>
+        <h3>Geoinnova 2025</h3> 
         </div>
     </div>
   

@@ -78,7 +78,6 @@ const extendControls = [
   //FullScreenControl,
   //zoomToLaCoruñaControl,
   //MousePositionControl,
-  //scaleControl,
   scaleControl2,
   //new infoControl (),
 ];
@@ -98,7 +97,12 @@ searchBtn.addEventListener("click", () => {
     searchLocation(query);
   }
 });
-
+// para buscar presionando enter:
+searchBox.addEventListener("keypress", (event) => {
+  if (event.key === "Enter") {
+    searchBtn.click();
+  }
+});
 async function searchLocation(query) {
   const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`;
 
@@ -150,20 +154,10 @@ const osmLayer = new TileLayer ({
   type: "base",
   });
   
-  const MTN50 = new TileLayer ({
-    title: "WMS MTN50",
-    visible: false,
-    source: new TileWMS ({
-      url: "https://www.ign.es/wms/primera-edicion-mtn",
-      params: {LAYERS: "MTN50", TILED: true},
-    }),
-  type: "base",
-  });
-  
   // Añadir las capas a un grupo de capas base
   const baseLayers = new LayerGroup({
     title: "Capas Base",
-    layers: [osmLayer, ortoPNOALayer, MTN50],
+    layers: [osmLayer, ortoPNOALayer],
   });
   
 const map = new Map({
@@ -188,17 +182,30 @@ const layerSwitcher = new LayerSwitcher({
     tipLabel: "Capas", // Tooltip al pasar el mouse
     groupSelectStyle: "group", // Muestra solo una capa base a la vez
   });
-  
-  map.addControl(layerSwitcher);
-  // Capa vectorial:
-  const caminosantiago = new VectorLayer ({
-    title: "Caminos de Santiago",
-    visible: true,
-    source: new VectorSource({
-      format: new GeoJSON (),
-      url: "./data/caminos_santiago.geojson",
-    }),
-  });
 
-  
+map.addControl(layerSwitcher);
+
+// Agregar documento vinculado a un punto
+const feature = new ol.Feature({
+  geometry: new ol.geom.Point(ol.proj.fromLonLat([-74.006, 40.7128])),
+  name: "Documento",
+  documentURL: "https://ejemplo.com/documento.pdf"
+});
+
+const vectorSource = new ol.source.Vector({
+  features: [feature]
+});
+
+const vectorLayer = new ol.layer.Vector({
+  source: vectorSource,
+  style: new ol.style.Style({
+    image: new ol.style.Icon({
+      anchor: [0.5, 1],
+      src: "https://cdn-icons-png.flaticon.com/512/684/684908.png", // Ícono del marcador
+      scale: 0.05
+    })
+  })
+});
+
+map.addLayer(vectorLayer);
 sync(map);

@@ -114,10 +114,10 @@ ________________________________________________________________________________
 .sidebar {
   position: absolute;
   top: 0;
-  left: -250px; /* Oculta la barra fuera de la pantalla */
+  left: -250px; /* Oculta barra */
   width: 220px;
   height: 100%;
-  background: rgb(100, 159, 199, 0.767);
+  background: rgba(64, 67, 68, 0.466);
   color: white;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -128,7 +128,7 @@ ________________________________________________________________________________
 .sidebar-container:hover {
   width: 220px;
 }
-/* Muestra la barra cuando el usuario pasa el mouse */
+/* Mostrar la barra cuando el usuario pasa el mouse */
 .sidebar-container:hover .sidebar {
   left: 0; 
 }
@@ -163,10 +163,43 @@ ________________________________________________________________________________
   margin-top: 15px;
   font-size: 14px;
 }
+/* logo*/
 .sidebar-logo {
   display: block;
-  width: 100px; /* Ajusta el tamaño del logo */
+  width: 100px; /* tamaño*/
   height: auto;
-  margin: 10px auto; /* Centrar el logo */
-  border-radius: 10px; /* Bordes redondeados si es necesario */
+  margin: -20px auto; /* Centrar */
+
+
+/* Estilo del select */
+#themeSelect {
+  width: 100%;
+  padding: 8px;
+  border: none;
+  background: #080501;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+/* Efecto hover para el select */
+#themeSelect:hover {
+  background: #1b4b25;
+  color: rgb(156, 223, 173);
+  font-weight: bold;
+}
+
+/* Efecto cuando el select está en foco (clicado) */
+#themeSelect:focus {
+  background: #000000;
+  color: rgb(156, 223, 173);
+  font-weight: bold;
+  outline: none;
+}  
+}
+h3 {
+  display:flex;
+  font-size: 12px; 
+  margin: 30px auto;
 }
