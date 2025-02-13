@@ -4,6 +4,8 @@
 ______________________________________________________________________________________________*/
 // Librerias base
 import './style.css';
+import "ol-layerswitcher/dist/ol-layerswitcher.css";
+
 
 //librerias Mapa
 import {Map, View} from 'ol';
