@@ -168,10 +168,11 @@ ________________________________________________________________________________
   display: block;
   width: 100px; /* tamaño*/
   height: auto;
-  margin: -20px auto; /* Centrar */
+  margin: 50px auto; /* Centrar */
 
-
+  
 /* Estilo del select */
+
 #themeSelect {
   width: 100%;
   padding: 8px;
@@ -192,7 +193,7 @@ ________________________________________________________________________________
 
 /* Efecto cuando el select está en foco (clicado) */
 #themeSelect:focus {
-  background: #000000;
+  background: #1b4b25;
   color: rgb(156, 223, 173);
   font-weight: bold;
   outline: none;
@@ -201,5 +202,5 @@ ________________________________________________________________________________
 h3 {
   display:flex;
   font-size: 12px; 
-  margin: 30px auto;
+  margin: 50px auto;
 }
