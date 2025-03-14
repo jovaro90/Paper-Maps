@@ -1,38 +1,7 @@
-/* 26/02/25:
+/*-------------       1.LIBRERIAS       ---------------*/
 
-1.- TERMINAR:
-  Estetica cuadro de resultados  
-  Estetica graficos
-  Pensar en estadisticos
-  Rellenar .csv con artículos
-  Marcar el punto de los articulos/estudios en el mapa (no da error pero no funciona)
-  Grafico estadísticos temática: no compara % estudios de cada temática ya que el filtrado es anterior
-  Si los estudios contienen datos, implementarlos con GeoJSON
-  Una vez marcados los puntos en el mapa, poder seleccionar una area y quedarte solo con esos
-  
-  2.- ERRORES:
-  SOLUCIONADO!!  Con el OL (ReferenceError: ol is not defined en consola web) 
-  El clic en la "X" para cerrar (ReferenceError: closePopup is not defined)
-  
-  3.- el dossier
-
-
-*/
-
-
-
-
-
-
-/*      _______________
-        || LIBRERIAS ||
-        ||_____1_____||      
-______________________________________________________________________________________________*/
-// Librerias base
 import './style.css';
 import "ol-layerswitcher/dist/ol-layerswitcher.css";
-
-
 //librerias Mapa
 import {Map, View} from 'ol';
 import {OSM, TileWMS, Vector as VectorSource} from 'ol/source'; //teselado
@@ -45,7 +14,6 @@ import { Style, Icon } from 'ol/style';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Text from 'ol/style/Text';
-
 import Overlay from 'ol/Overlay';
 //librerias Controles
 import { defaults as defaultControls} from "ol/Control";
@@ -55,29 +23,15 @@ import { MousePosition } from 'ol/Control';
 import { ZoomToExtent } from 'ol/Control';
 import { FullScreen } from 'ol/Control';
 import { Control } from 'ol/Control';
-
 // librerias coordenadas puntero
 import { format } from 'ol/coordinate'; 
 import { transformExtent } from 'ol/proj';
-
-
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
 
 
-
-/*      _______________
-        || CONTROLES ||
-        ||_____2_____||      
-______________________________________________________________________________________________*/
-// 2.1 Titulo
-const mapTitle = document.createElement('div');
-mapTitle.className = 'map-title';
-mapTitle.innerHTML = 'Paper Maps'; 
-
-const mapContainer = document.getElementById('map');
-mapContainer.appendChild(mapTitle);
+/*-------------       2.CONTROLES Y CONFIGURACION DEL MAPA       ---------------*/
 
 // 2.2 Escala
 const scaleControl2 = new ScaleLine ({
@@ -102,18 +56,12 @@ const OverviewMapControl = new OverviewMap ({
 // variable controles extendida:
 const extendControls = [
   OverviewMapControl,
-  //FullScreenControl,
-  //zoomToLaCoruñaControl,
-  //MousePositionControl,
   scaleControl2,
-  //new infoControl (),
 ];
 
 
-/*      _______________
-        || Barra de  ||
-        ||_Busqueda__||      
-______________________________________________________________________________________________*/
+/*-------------       3.CARGAR CSV Y FILTRAR RESULTADOS      ---------------*/
+
 // Cargar el archivo CSV desde el directorio público
 fetch('/buscador.csv')
   .then(response => response.text())  // Obtener el archivo como texto
@@ -134,11 +82,9 @@ fetch('/buscador.csv')
       console.error('Los datos CSV aún no están disponibles.');
       return;
     }
-  /*    _______________
-        || RESULTADOS||
-        ||___________||      
-______________________________________________________________________________________________*/
+  
 
+    /*-------------       4.MOSTRAR RESULTADOS EN MAPA       ---------------*/
     const filteredResults = window.csvData
     .filter(item => item.ubicacion && item.tematica && item.anio && item.palabraclave) // Filtrar objetos inválidos
     .filter(item => {
@@ -193,7 +139,7 @@ document.getElementById('searchBtn').addEventListener('click', function() {
   displaySearchResults(filteredResults);
 
 
-  //----------- PARA VER PUNTOS DE RESULTADOS FILTRADOS EN EL MAPA ----------
+  /*-------------       5.CLICAR PUNTOS MAPA Y DAR INFO      ---------------*/
   // Agregar puntos filtrados al mapa
   addFilteredPointsToMap(filteredResults);
   
@@ -202,6 +148,19 @@ document.getElementById('searchBtn').addEventListener('click', function() {
 function addFilteredPointsToMap(filteredResults) {
   // Crear una fuente vectorial para los puntos filtrados
   const vectorSource = new VectorSource();
+
+// Crear el Overlay que actuará como el popup
+const popupContainer = document.getElementById('popupContainer');
+const popupResults = document.getElementById('popupInfo');
+const popupContent = document.getElementById('popupInfoContent');
+const overlay = new Overlay({
+  element: popupContainer, // Elemento del popup
+  autoPan: true, // Para que el mapa se mueva para mostrar el popup
+  autoPanAnimation: {
+    duration: 250, // Duración de la animación de desplazamiento
+  },
+});
+map.addOverlay(overlay); // Añadir el overlay al mapa
 
   // Iterar sobre los resultados filtrados para agregar puntos al vectorSource
   filteredResults.forEach(item => {
@@ -226,6 +185,7 @@ function addFilteredPointsToMap(filteredResults) {
         })
       }));
       console.log(filteredResults);
+      
       // Añadir el punto al vectorSource
       vectorSource.addFeature(point);
     }
@@ -236,20 +196,44 @@ function addFilteredPointsToMap(filteredResults) {
     source: vectorSource
   });
 
-  // Añadir la capa vectorial al mapa (eliminar cualquier capa anterior si es necesario)
-  map.getLayers().forEach(layer => {
-    if (layer instanceof VectorLayer) {
-      map.removeLayer(layer); // Eliminar capa anterior si existe
+
+  map.addLayer(vectorLayer);
+
+  // Evento de selección de puntos
+  const selectInteraction = new ol.interaction.Select({
+    condition: ol.events.condition.click, // Evento click en el mapa
+  });
+
+  selectInteraction.on('select', function (event) {
+    const selectedFeature = event.selected[0]; // Obtiene la característica seleccionada
+
+    if (selectedFeature) {
+      const name = selectedFeature.get('name');
+      const description = selectedFeature.get('descripcion');
+      const link = selectedFeature.get('link');
+
+      // Muestra la información en el popup
+      popupContent.innerHTML = `
+        <h3>${name}</h3>
+        <p>${description}</p>
+        <a href="${link}" target="_blank">Más información</a>
+      `;
+      popupContainer.style.display = 'flex';
+      overlay.setPosition(selectedFeature.getGeometry().getCoordinates());
     }
   });
-  
-  map.addLayer(vectorLayer); // Añadir la nueva capa de puntos filtrados
+
+  map.addInteraction(selectInteraction); // Agregar la interacción de selección al mapa
 }
-/*      _______________
-        || RESULTADOS||
-        ||___POPUPS__||      
+/*      ___________________
+        || INFO AL CLICAR||
+        ||____POPUPS_____||      
 ______________________________________________________________________________________________*/
 // Función para mostrar los resultados de búsqueda en un popup
+// Función para abrir el popup
+function openPopup() {
+  document.getElementById('popupContainer').style.display = 'flex'; // Mostramos el contenedor del popup
+}
 // Función para cerrar el popup
 function closePopup() {
   const popupContainer = document.getElementById('popupContainer');
@@ -260,7 +244,7 @@ function closePopup() {
     
 // Cerrar el popup cuando se haga clic en la "X"
 document.querySelector('.close-btn').addEventListener('click', function() {
-  closePopup(); // Aquí se llama a la función closePopup
+  closePopup('popupInfo'); // Aquí se llama a la función closePopup
 });
   
  // Cerrar el popup si se hace clic fuera de él
@@ -351,12 +335,10 @@ function displaySearchResults(results) {
 
   
     popupContainer.style.display = 'flex'; // Mostrar ambos popups juntos
-    popupResults.style.display = 'block';
+    popupInfo.style.display = 'block';
 
     generateStatistics(results); // Generar estadísticas
 }
-
-
 /*      _______________
         || RESULTADOS||
         ||__GRAFICOS_||      
@@ -488,6 +470,98 @@ function generateStatistics(results) {
   }
 }
 
+/*-------------       7.AREA DE SELECCION      ---------------*/
+// Variable global para el vectorLayer que contiene el área seleccionada
+let drawInteraction = null;
+
+// Función para activar el control de dibujo
+function activateDrawing() {
+  // Crear una nueva capa vectorial para la selección
+  const vectorSource = new VectorSource();
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+  });
+
+  // Crear el control de dibujo para el polígono
+  drawInteraction = new ol.interaction.Draw({
+    source: vectorSource,
+    type: 'Polygon',
+  });
+
+  // Agregar el control de dibujo al mapa
+  map.addInteraction(drawInteraction);
+
+  // Cuando se complete el dibujo, capturamos el polígono
+  drawInteraction.on('drawend', function (event) {
+    const feature = event.feature;
+    const geometry = feature.getGeometry();
+    const coordinates = geometry.getCoordinates();
+
+    // Llamar a una función para filtrar los puntos de acuerdo con el área seleccionada
+    filterResultsByArea(coordinates);
+  });
+}
+
+// Función para detener el control de dibujo
+function deactivateDrawing() {
+  if (drawInteraction) {
+    map.removeInteraction(drawInteraction);
+    drawInteraction = null;
+  }
+}
+
+// Evento del botón para activar la selección del área
+document.getElementById('selectAreaBtn').addEventListener('click', function () {
+  if (drawInteraction) {
+    deactivateDrawing(); // Desactivar el dibujo si ya está activado
+  } else {
+    activateDrawing(); // Activar el dibujo
+  }
+});
+// Variable para almacenar la capa que contendrá los puntos filtrados
+let filteredPointsLayer = null;
+
+// Función para filtrar los resultados dentro del área seleccionada
+function filterResultsByArea(areaCoordinates) {
+  // Convertir las coordenadas del área a un formato adecuado
+  const polygon = new ol.geom.Polygon([areaCoordinates]);
+
+  // Asegurarse de que las coordenadas del polígono estén en el mismo sistema de coordenadas que el mapa
+  polygon.transform('EPSG:4326', 'EPSG:3857');  // Transformar de EPSG:4326 a EPSG:3857
+
+  // Filtrar los resultados de CSV (o cualquier fuente de datos) que estén dentro del área
+  const filteredResults = window.csvData.filter(item => {
+    const lat = parseFloat(item.Latitud);  // Obtener la latitud
+    const lon = parseFloat(item.Longitud); // Obtener la longitud
+
+    // Validar si las coordenadas son válidas
+    if (isNaN(lat) || isNaN(lon)) return false;
+
+    // Mostrar las coordenadas para depuración
+    console.log('Punto a verificar:', lat, lon);
+
+    // Convertir las coordenadas del punto a EPSG:3857
+    const point = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
+
+    // Verificar si el punto está dentro del polígono
+    const insidePolygon = polygon.intersectsCoordinate(point.getCoordinates());
+
+    // Mostrar si el punto está dentro del polígono para depuración
+    console.log('Está el punto dentro del polígono?', insidePolygon);
+
+    return insidePolygon;
+  });
+
+  // Mostrar los resultados filtrados en la consola (para depuración)
+  console.log('Puntos dentro del área:', filteredResults);
+
+  // Mostrar los resultados filtrados en la interfaz
+  displaySearchResults(filteredResults);
+  
+  // Agregar los puntos filtrados al mapa
+  addFilteredPointsToMap(filteredResults);
+}
+
 
 
 
@@ -545,27 +619,4 @@ const layerSwitcher = new LayerSwitcher({
 
 map.addControl(layerSwitcher);
 
-/* Agregar documento vinculado a un punto
-const feature = new ol.Feature({
-  geometry: new ol.geom.Point(ol.proj.fromLonLat([-74.006, 40.7128])),
-  name: "Documento",
-  documentURL: "https://ejemplo.com/documento.pdf"
-});
-
-const vectorSource = new ol.source.Vector({
-  features: [feature]
-});
-
-const vectorLayer = new ol.layer.Vector({
-  source: vectorSource,
-  style: new ol.style.Style({
-    image: new ol.style.Icon({
-      anchor: [0.5, 1],
-      src: "https://cdn-icons-png.flaticon.com/512/684/684908.png", // Ícono del marcador
-      scale: 0.05
-    })
-  })
-});
-
-map.addLayer(vectorLayer); */
 sync(map);

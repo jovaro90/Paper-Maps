@@ -2,204 +2,174 @@
     <!-- rel : tipo de archivo vinculado (stylesheet es un CSS) -->
     <!-- href: URL del archivo que se va a cargar -->
     <!DOCTYPE html>
-    <html lang="es">
-      <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Using OpenLayers with Vite</title>
-        <!-- OL -->
-        <link rel="stylesheet" href="node_modules/ol/ol.css" />
-        <script src="node_modules/ol/dist/ol.js"></script>
-        <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.0.0/dist/ol-layerswitcher.css">
-        <!-- vinculo con css-->
-        <link rel="stylesheet" href="/style.css" /> 
-        <!-- href: iconos -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-        
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="https://openlayers.org/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Using OpenLayers with Vite</title>
 
-      </head>
+    <!-- OL -->
+    <link rel="stylesheet" href="node_modules/ol/ol.css" />
+    <script src="node_modules/ol/dist/ol.js"></script>
 
-      <body>
-        <!--biblioteca Papaparse para leer y convertir .csv-->  
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-        <!-- vinculo con main.js-->
-        <script type="module" src="./main.js"></script>
+    <!-- OL LayerSwitcher -->
+    <link rel="stylesheet" href="https://unpkg.com/ol-layerswitcher@4.0.0/dist/ol-layerswitcher.css">
 
-        <div class="container"></div>
+    <!-- Vinculo con el archivo CSS -->
+    <link rel="stylesheet" href="/style.css" />
     
-         <div class="map" id="map"></div>
-    
-        <div id="popup" class="ol-popup">
-          <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-          <div id="popup-content"></div>
-        </div>
-    <!--    _______________
-            || Barra de  ||
-            ||_Busqueda__||      
-    ______________________________________________________________________________________________*/
-     -->
-        <div class="sidebar-container">
-            <div class="sidebar">
-                <!-- Logo -->
-            
-            <!-- Ubicacion -->
-            <h2>Ubicación</h2>
-            <input type="text" id="searchLocation" placeholder="Añadir ubicación" />
-            <!--button id="searchBtn" class="styled-button">Buscar</button-->
-            <div id="searchResults"></div> <!-- Mostrar ubicación -->
+    <!-- Fuente de iconos -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 
-            <!-- Tematica -->
-            <h2>Temática</h2>
-            <label for="themeSelect">Seleccione una temática:</label>
-            <select id="themeSelect">
-              <option value="urbanismo">Urbanismo</option>
-              <option value="ambiental">Ambiental</option>
-              <option value="ciencias">Ciencia</option>
-              <option value="tecnologia">Tecnologia</option>
-              <option value="social">Social</option>
-              <option value="economia">Economia</option>
-            </select>
-    
-            <div id="searchResultsTheme"></div>
-            <!-- Año -->
-            <h2>Fecha</h2>
-            <input type="number" id="yearFilter" placeholder="Añadir año" />
-            <h2>Palabra clave</h2>
-            <input type="text" id="searchBox" placeholder="Añadir palabra clave">
-            <button id="searchBtn">Buscar</button>
-            <div id="searchResults"></div>
-    
-            <!-- contador resultados encontrados -->
-                <div id="resultCount">Resultados encontrados: 0</div>
-    
-            <h3> </h3>
-            <h3></h3>
-            <!-- <img src="https://geoinnova.org/wp-content/themes/genesis-sample/images/brand/geoinnova_web.svg" alt="Logo" class="sidebar-logo"> -->
-            <h3>TFM Sistemas de información Geográfica en código abierto</h3>
-            <h3>Autor: Jordi Valls Roig</h3>
-            <h3>Geoinnova 2025</h3> 
-            </div>
-        </div>
-      
-       
+    <!-- Librería PapaParse para leer y convertir archivos .csv -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+  </head>
 
-        <!-- Popup de salida de resultados de los estudios -->
-        <!-- Popup -->
-        <div id="popupContainer">
-          <div id="popupResults" class="popup">
-              <div class="popup-content">
-                  <span class="close-btn" onclick="closePopup('popupResults')">&times;</span>
-                  <h2>Resultados de Búsqueda</h2>
-                  <div id="popupResultsContent"></div>
-              </div>
-          </div>
-      
-          <div id="popupStats" class="popup-stats">
-            <span class="close-btn" onclick="closePopup('popupResults')">&times;</span>
-            <!-- Gráfico de Temáticas -->
-            <canvas id="pieChart"></canvas>
-            <h4>Proyectos por Temática</h4>
-          
-            <!-- Gráfico de Años dentro de una Temática -->
-            <canvas id="barChart"></canvas>
-            <h4>Proyectos por Año (en la temática seleccionada)</h4>
-          </div>          
+  <body>
+    <!-- Cabecera de la página -->
+    <header class="full-width-header">
+      <div class="header-content">
+        <h1>Paper Maps</h1>
+        <p>TFM Sistemas de Información Geográfica en Código Abierto.</p>
+        <button id="selectAreaBtn">Seleccionar Área</button>
+        <script src="your_script.js" defer></script>
       </div>
+    </header>
 
+    
+    <!-- Contenedor de la mapa -->
+    <div class="container"></div>
+    <div class="map" id="map"></div>
 
-<!-- Estilos del Popup -->
-<style>
-  .popup {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 10;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+    <!-- Sidebar de salida de resultados de los estudios -->
+    <div id="sidebarResults" class="sidebar-right">
+      <h2>Resultados de Búsqueda</h2>
+      <div id="popupResultsContent"></div>
+      <h4>Proyectos por Temática</h4>
+        <canvas id="pieChart"></canvas>
+        <h4>Proyectos por Año (en la temática seleccionada)</h4>
+        <canvas id="barChart"></canvas>
+    </div>
 
-  .popup-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 50%;
-    text-align: center;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  }
-
-  .close-btn {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .close-btn:hover {
-    color: red;
-  }
-</style>
-
-<!-- Popup de Graficas comparativos estadísticos -->
-<div id="popupResults" class="popup">
-  <div class="popup-content">
-    <span class="close-btn" onclick="closePopup('popupResults')">&times;</span>
-    <h2>Resultados de la búsqueda</h2>
-    <div id="popupResultsContent"></div>
+ <!-- Popup info punto -->
+      <!-- Contenedor principal para el popup -->
+<div id="popupContainer" style="display: none;">
+  <div id="popupInfo">
+    <div id="popupInfoContent">
+      <!-- Contenido del popup -->
+      <p>Este es un ejemplo de contenido dentro del popup.</p>
+    </div>
+    <button id="closePopup" class="close-btn">Cerrar</button>
   </div>
 </div>
 
-<!-- Popup de Estadísticas -->
-<div id="popupStats" class="popup">
-  <div class="popup-content">
-    <span class="close-btn" onclick="closePopup('popupStats')">&times;</span>
-    <h2>📊 Estadísticas Comparativas</h2>
-    <canvas id="statsChart"></canvas>
-  </div>
-</div>
+<!-- Popup clicar puntos -->
+      <div id="popupContainer" style="display: none; position: absolute; background-color: white; padding: 10px; border: 1px solid black; border-radius: 5px;">
+        <div id="popupResultsContent"></div>
+      </div>
+      <div id="popupStats" class="popup-stats">
+        <span class="close-btn" onclick="closePopup('popupStats')">&times;</span>
+      </div>
+    </div>
 
-<!-- Estilos del Popup -->
-<style>
-  .popup {
-    display: none; 
-    position: fixed; 
-    z-index: 1000; 
-    left: 70%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    background-color: rgba(243, 17, 17, 0);
-  }
+    <!-- Sidebar de Búsqueda -->
+    <div class="sidebar-container">
+      <div class="sidebar">
+        <!-- Logo (opcional) -->
+        <!-- <img src="logo.png" alt="Logo" class="sidebar-logo"> -->
 
-  .popup-content {
-    background-color: white;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 90%;
-    max-width: 600px;
-    text-align: center;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-  }
+        <!-- Ubicación -->
+        <h2>Ubicación</h2>
+        <input type="text" id="searchLocation" placeholder="Añadir ubicación" />
+        <div id="searchResults"></div> <!-- Mostrar ubicación -->
 
-  .close-btn {
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
+        <!-- Temática -->
+        <h2>Temática</h2>
+        <label for="themeSelect">Seleccione una temática:</label>
+        <select id="themeSelect">
+          <option value="urbanismo">Urbanismo</option>
+          <option value="ambiental">Ambiental</option>
+          <option value="ciencias">Ciencia</option>
+          <option value="tecnologia">Tecnología</option>
+          <option value="social">Social</option>
+          <option value="economia">Economía</option>
+        </select>
+    
+        <div id="searchResultsTheme"></div>
+        
+        <!-- Año -->
+        <h2>Fecha</h2>
+        <input type="number" id="yearFilter" placeholder="Añadir año" />
 
-  .close-btn:hover {
-    color: red;
-  }
-</style>
+        <!-- Palabra clave -->
+        <h2>Palabra clave</h2>
+        <input type="text" id="searchBox" placeholder="Añadir palabra clave">
+        <button id="searchBtn">Buscar</button>
+        <div id="searchResults"></div>
 
-<!-- Librería Chart.js para gráficos -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Contador de resultados encontrados -->
+        <div id="resultCount">Resultados encontrados: 0</div>
+      </div>
+    </div>
 
-      </body>
-    </html>
+    <!-- Librería Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Vinculo con el archivo JS principal -->
+    <script type="module" src="./main.js"></script>
+
+    <!-- Estilos del Popup -->
+    <style>
+      .popup {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 10;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .popup-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .close-btn {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close-btn:hover {
+        color: rgb(58, 84, 168);
+      }
+
+      /* Estilos para la cabecera */
+    
+      
+    </style>
+
+    <!-- Scripts para la lógica de apertura/cierre de popups y sidebars -->
+    <script>
+      function openSidebar(sidebarId) {
+        const sidebar = document.getElementById(sidebarId);
+        sidebar.classList.add('active');
+      }
+
+      function closeSidebar(sidebarId) {
+        const sidebar = document.getElementById(sidebarId);
+        sidebar.classList.remove('active');
+      }
+    </script>
+  </body>
+</html>

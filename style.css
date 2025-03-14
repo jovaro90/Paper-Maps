@@ -1,53 +1,159 @@
-@import "node_modules/ol/ol.css"; /* para moviles y tablets*/
+/* Estilos generales */
+@import "node_modules/ol/ol.css"; /* para moviles y tablets */
 
 html, body {
   margin: 0;
   height: 100%;
   overflow: hidden; /* Evita la barra de desplazamiento */
 }
+/* -------------- MAPA ---------------------------- */
 #map {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
 }
-/*      _______________
-        ||  TITULO   ||
-        ||___________||      
-______________________________________________________________________________________________*/
-.map-title {
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(100, 159, 199, 0.767); 
-  color: rgb(255, 255, 255);
-  padding: 10px 15px;
-  font-size: 20px;
-  font-weight: bold;
-  border-radius: 5px;
-  z-index: 1000; /* Asegura que esté por encima del mapa */
-  box-shadow: 0 7px 8px rgba(0, 0, 0, 0.4);
+
+/* -------------- CABECERA ---------------------------- */
+/* Estilos para la cabecera */
+/* Estilos para la cabecera */
+.full-width-header {
+  width: 100%;
+  background: linear-gradient(to right, #004d7a, #008793, #00bf72);
+  color: white;
+  text-align: center;
+  position: fixed;
+  z-index: 1000;
+  padding: 20px 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/*      _______________
-        ||  ESCALA   ||
-        ||___________||      
-______________________________________________________________________________________________*/
-/* Barra escala */
+
+.header-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 10px;
+}
+
+.header-content h1 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.header-content p {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+#selectAreaBtn {
+  background: #ffcc00;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+#selectAreaBtn:hover {
+  background: #ff9900;
+}
+
+@media (max-width: 600px) {
+  .header-content h1 {
+      font-size: 1.5rem;
+  }
+  .header-content p {
+      font-size: 1rem;
+  }
+  #selectAreaBtn {
+      font-size: 0.9rem;
+      padding: 8px 16px;
+  }
+}
+
+/* -------------- SIDEBAR INFO ---------------------------- */
+/* Sidebar a la derecha */
+.sidebar-right {
+  position: fixed;
+  top: 0;
+  right: 0px; /* Inicialmente oculta fuera de la pantalla */
+  width: 400px;
+  height: 100%;
+  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
+  color: #333;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
+  transition: right 0.3s ease-in-out;
+  z-index: 1000;
+}
+
+.sidebar-right.open {
+    right: 0; /* Se muestra al agregar la clase 'open' */
+}
+
+@media (max-width: 600px) {
+    .sidebar-right {
+        width: 100%;
+    }
+}
+
+
+
+/* -------------- GRAFICOS ---------------------------- */
+/* Estilo para el canvas de las estadísticas */
+#statsChart {
+  width: 100%;
+  height: 250px; /* Limita la altura del gráfico */
+  max-height: 300px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+/* Estilo adicional para el contenido dentro de las sidebars */
+.sidebar-right h2 {
+  margin-top: 50px;
+  font-size: 18px;
+}
+
+/* Estilo para los botones de abrir las sidebars */
+#openResultsBtn, #openStatsBtn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+#openResultsBtn:hover, #openStatsBtn:hover {
+  background-color: #45a049;
+}
+
+/* -------------- ESCALA ---------------------------- */
+/* Estilos de la barra de escala */
 .ol-scale-bar {
   background-color: rgba(158, 158, 155, 0); /* Fondo oscuro */
   border-radius: 7px; /* Bordes redondeados */
   padding: 20px 9px; /* Espaciado interno */
   color: rgb(0, 0, 0); /* Texto blanco */
   box-shadow: 0 20px 8px rgba(0, 0, 0, 0); /* Sombra para dar profundidad */
-  transform:perspective() 
 }
-/* texto barra de la escala*/
+
+/* texto barra de la escala */
 .ol-scale-bar-text {
   font-weight: bold; /* Fuente en negrita */
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra en el texto */
 }
+
 /* texto de la escala */
 .ol-scale-text {
   color: #000000;
@@ -57,21 +163,13 @@ ________________________________________________________________________________
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
 }
-/* texto unidades divisiones*/ 
-.ol-scale-step-text {
-  color: #070e07;
-  top: 34px;
-  font-size: 14px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
-}
-/*      _________________
-        ||  MINIMAPA   ||
-        ||_____________||      
-______________________________________________________________________________________________*/
+
+/* -------------- MINIMAPA ---------------------------- */
+/* Barra minimapa */
 .ol-overviewmap {
   position: absolute;
   top: 82.5%;
-  left:92%;
+  left: 92%;
   transform: translate(-50%);
   width: 20px;
   height: 150px;
@@ -80,28 +178,9 @@ ________________________________________________________________________________
   box-shadow: 0 4px 8px rgba(226, 27, 27, 0);
   transition: right 0.3s ease-in-out;
 }
-.ol-overviewmap button {
-  position: absolute;
-  top: -7%;
-  transform: translateY(-50%);
-  background-color: rgba(100, 159, 199, 0.767);
-  color: rgb(255, 255, 255);
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0px 0px 6px rgb(0, 0, 0);
-}
 
-.ol-overviewmap:hover {
-  background-color: #7fffd400;
-}
-
-/*      _______________
-        || Barra de  ||
-        ||_Busqueda__||      
-______________________________________________________________________________________________*/
-/* Estilo de la franja lateral */
-/* Contenedor lateral que detecta el hover */
+/* -------------- SIDEBAR IZQUIERDA ---------------------------- */
+/* Contenedor lateral para búsqueda */
 .sidebar-container {
   position: absolute;
   top: 0;
@@ -111,28 +190,32 @@ ________________________________________________________________________________
   transition: width 0.3s ease;
   z-index: 1000;
 }
-/* Barra lateral */
+
+/* Barra lateral para búsqueda */
 .sidebar {
   position: absolute;
   top: 0;
   left: -250px; /* Oculta barra */
   width: 220px;
   height: 100%;
-  background: rgba(64, 67, 68, 0.466);
+  background: rgb(64, 67, 68);
   color: white;
   padding: 20px;
   font-family: Arial, sans-serif;
   box-shadow: 3px 0 10px rgba(0, 0, 0, 0.5);
   transition: left 0.3s ease;
 }
-/* Mostrar la barra lateral cuando el cursor se acerca */
+
+/* Mostrar barra lateral al pasar el mouse */
 .sidebar-container:hover {
   width: 220px;
 }
-/* Mostrar la barra cuando el usuario pasa el mouse */
+
+/* Mostrar barra al pasar el mouse */
 .sidebar-container:hover .sidebar {
-  left: 0; 
+  left: 0;
 }
+
 /* Estilos del cuadro de búsqueda */
 #searchBox {
   width: 100%;
@@ -142,6 +225,7 @@ ________________________________________________________________________________
   border-radius: 5px;
   font-size: 14px;
 }
+
 /* Botón de búsqueda */
 #searchBtn {
   width: 100%;
@@ -154,26 +238,28 @@ ________________________________________________________________________________
   cursor: pointer;
   border-radius: 5px;
 }
+
 #searchBtn:hover {
   background: #1b4b25;
   color:rgb(156, 223, 173);
   font-weight: bold;
 }
+
 /* Resultados de búsqueda */
 #searchResults {
   margin-top: 15px;
   font-size: 14px;
 }
-/* logo*/
+
+/* Logo */
 .sidebar-logo {
   display: block;
-  width: 100px; /* tamaño*/
+  width: 100px;
   height: auto;
-  margin: 50px auto; /* Centrar */
+  margin: 50px auto;
+}
 
-  
 /* Estilo del select */
-
 #themeSelect {
   width: 100%;
   padding: 8px;
@@ -198,23 +284,64 @@ ________________________________________________________________________________
   color: rgb(156, 223, 173);
   font-weight: bold;
   outline: none;
-}  
-}
-h3 {
-  display:flex;
-  font-size: 12px; 
-  margin: 50px auto;
 }
 
-/*      _______________
-        || POPUPs    ||
-        ||___________||      
-______________________________________________________________________________________________*/
 
+/* -------------- POPUP INFO ---------------------------- */
+/* Estilo para el contenedor del popup */
 #popupContainer {
-  display: none;  /* Usamos Grid para disponer los popups */
-  
-  gap: 10px;  /* Espacio entre los popups */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
+  display: none; /* Ocultamos el popup inicialmente */
+  justify-content: center;
+  align-items: center;
+  z-index: 10000; /* Asegura que esté por encima de otros elementos */
+}
+
+/* Estilo para el propio popup */
+#popupInfo {
+  background-color: white;
+  width: 80%; /* Puedes ajustarlo a tu gusto */
+  max-width: 600px; /* Máximo tamaño de ancho */
+  min-height: 300px; /* Altura mínima */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+#popupInfoContent {
+  flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
+}
+
+.close-btn {
+  align-self: flex-end; /* Coloca el botón de cerrar en la esquina */
+  padding: 10px 20px;
+  background-color: rgb(64, 97, 167);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background-color: darkred;
+}
+
+/* -------------- POPUPS ---------------------------- */
+
+/* Estilos para los popups */ 
+#popupContainer {
+  display: none;
+  gap: 10px;
+  min-width: 300px;
   justify-content: center;
   align-items: center;
   position: fixed;
@@ -229,8 +356,6 @@ ________________________________________________________________________________
 .popup {
   display: none;
   background-color: rgba(0, 0, 0, 0);
-  /*border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0);*/
   padding: 10px;
   height: 80vh;
   overflow-y: auto;
@@ -252,49 +377,53 @@ ________________________________________________________________________________
 }
 
 .close-btn:hover {
-  color: red;
+  color: Wred;
 }
-/* Responsive: en pantallas pequeñas, los popups estarán en columna */
+*/
+
+/* -------------- TABLETS ---------------------------- */ /*
 @media (max-width: 768px) {
   #popupContainer {
-    flex-direction: column;  /* Cambiar a columna en pantallas pequeñas */
+    flex-direction: column;
   }
 
   .popup {
-    width: 70%;  /* Los popups ocuparán más espacio en pantallas pequeñas */
+    width: 70%;
   }
 }
-
+*/
+/* -------------- POPUP RESULTADOS ---------------------------- */
 #popupResults {
   position: absolute;
   top: 10%;
   left: 30%;
-  transform: translateX(-50%); /* No puede ser más alto que el 80% de la altura de la ventana */
-  overflow-y: auto; /* Agrega una barra de desplazamiento si es necesario */
+  transform: translateX(-50%);
+  overflow-y: auto;
 }
 
-/* Estilo para el popupStats */
 #popupStats {
   position: absolute;
   top: 1%;
   left: 30%;
-  transform: translateX(-50%);/* Limita el tamaño máximo del popup */
-  height: auto; /* Deja que el alto se ajuste automáticamente */
+  transform: translateX(-50%);
+  height: auto;
   width: 100%;
-  max-width: 500px; /* Limitar el ancho máximo del popup */
-  max-height: 600px; /* Limitar la altura máxima */
-  overflow: auto; /* Si el contenido excede el tamaño, muestra una barra de desplazamiento */
+  max-width: 500px;
+  max-height: 600px;
+  overflow: auto;
   padding: 20px;
-  box-sizing: border-box; /* Asegura que el padding no haga que el contenedor crezca más allá del máximo */
+  box-sizing: border-box;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  position: relative;
 }
 
-/* Limita el tamaño del canvas dentro del popup */
+/* -------------- POPUP QUESITO ---------------------------- */
 #statsChart {
   width: 100%;
-  height: 250px; /* Limita la altura del gráfico */
+  height: 50px;
   max-height: 300px;
 }
+
+/*-------------------------------*/
+
