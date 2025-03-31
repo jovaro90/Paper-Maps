@@ -1,3 +1,5 @@
+import { getUsername } from "./login";
+
 export async function addNewData(event) {
     // Verificar si el evento existe y prevenir el comportamiento predeterminado
     if (event && typeof event.preventDefault === 'function') {
@@ -50,7 +52,7 @@ export async function addNewData(event) {
         anio: anio || '',  // Opcional
         palabraclave: palabraClave || '', // Opcional
         descripcion: descripcion || '', // Opcional
-        usuario, // Agregar el usuario que subió los datos
+        usuario: getUsername(), // Agregar el usuario que subió los datos
     };
 
     try {

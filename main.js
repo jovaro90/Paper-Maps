@@ -228,6 +228,7 @@ import {
   submitRegistration,
   setUserRole,
   initializeRoleAndSidebarEvents, 
+  getUsername,
   
 } from './modules/login.js';
 
@@ -257,9 +258,16 @@ window.onload = function () {
   if (cancelRegisterBtn) {
     cancelRegisterBtn.addEventListener('click', closeRegisterPopup);
   }
+  const username = getUsername();
 };
 // Vincular el botón de registro al popup
 document.getElementById('registerBtn').addEventListener('click', openRegisterPopup);
+
+document.getElementById('someButton').addEventListener('click', function () {
+  const username = getUsername();
+  console.log('Nombre de usuario:', username);
+  // Realiza alguna acción con el nombre de usuario
+});
 
 
 //-----------------------------------------------------------//

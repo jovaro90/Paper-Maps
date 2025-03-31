@@ -235,3 +235,9 @@ export function initializeRoleAndSidebarEvents() {
       console.error('No se encontró el elemento con ID "sidebar".');
     }
   }
+
+  export function getUsername() {
+    if (username) {
+      return username;
+    } 
+  }
