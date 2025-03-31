@@ -1,0 +1,12 @@
+username,password,role
+admin,admin123,admin
+user1,user123,user
+jordi, jordi, admin
+12, 12, viewer
+4, 4, admin
+5,5,viewer
+10,10,viewer
+55,55,admin
+22,22,admin
+1,1,admin
+hector,123,admin

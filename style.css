@@ -12,54 +12,67 @@ html, body {
   top: 0;
   bottom: 0;
   width: 100%;
+  z-index: 800; /* Asegurar que el mapa esté detrás de la cabecera */
+}
+
+/* Estilos para el contenedor del mapa */
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
 }
 
 /* -------------- CABECERA ---------------------------- */
 /* Estilos para la cabecera */
-/* Estilos para la cabecera */
 .full-width-header {
   width: 100%;
-  background: linear-gradient(to right, #004d7a, #008793, #00bf72);
-  color: white;
+  background: linear-gradient(to right, #19243100, #192431d0, #0c848d, #192431d8, #19243100);
+  color: rgb(255, 255, 255);
   text-align: center;
-  position: fixed;
-  z-index: 1000;
-  padding: 20px 0;
+  position: relative; /* Cambiar a relative */
+  z-index: 900; /* Asegurar que esté debajo de los botones pero encima del mapa */
+  padding: 2px 0; /* Reducir el espacio entre el borde y la cabecera */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 
 .header-content {
   max-width: 800px;
   margin: 0 auto;
-  padding: 10px;
+  padding: 5px;
 }
 
 .header-content h1 {
-  font-size: 2rem;
-  margin-bottom: 10px;
+  font-size: 5rem;
+  margin-bottom: 5px;
+  margin-top: 0; /* Reducir el espacio entre el título y el borde superior */
   font-weight: bold;
 }
 
 .header-content p {
   font-size: 1.2rem;
-  margin-bottom: 15px;
+  margin-bottom: 5px;
 }
 
 #selectAreaBtn {
-  background: #ffcc00;
-  color: #333;
-  border: none;
-  padding: 10px 20px;
-  font-size: 1rem;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 2px 3px;
+  font-size: 0.8rem;
   font-weight: bold;
-  border-radius: 5px;
+  border-radius: 3px;
   cursor: pointer;
   transition: background 0.3s ease;
 }
 
 #selectAreaBtn:hover {
-  background: #ff9900;
+  color:#000000;
+  background: #d3d0d0;
 }
 
 @media (max-width: 600px) {
@@ -75,16 +88,69 @@ html, body {
   }
 }
 
+/* Estilos para los botones en la cabecera */
+.header-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  margin-top: 1px;
+}
+
+/* estilo boton cabecera capas*/
+.header-btn {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 2px 3px; /* Tamaño uniforme */
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.header-btn:hover {
+  color:#000000;
+  background: #d3d0d0; /* Color más oscuro al pasar el mouse */
+}
+
+/* Estilo para el contenedor del LayerSwitcher en la cabecera */
+#layerSwitcherContainer {
+  display: inline-block;
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.layerSwitcher-btn {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 5px 10px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.layerSwitcher-btn:hover {
+  background: #d3d0d0;
+  color: #000000;
+}
 /* -------------- SIDEBAR INFO ---------------------------- */
-/* Sidebar a la derecha */
+/* Sidebar-right inicialmente oculta */
 .sidebar-right {
   position: fixed;
   top: 0;
-  right: 0px; /* Inicialmente oculta fuera de la pantalla */
+  right: -500px; /* Oculta fuera de la pantalla */
   width: 400px;
   height: 100%;
-  background: linear-gradient(to bottom, #ffffff, #f0f0f0);
-  color: #333;
+  background: #192431;
+  color: #000000;
   padding: 20px;
   font-family: Arial, sans-serif;
   box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
@@ -92,41 +158,62 @@ html, body {
   z-index: 1000;
 }
 
+/* Mostrar la sidebar cuando esté visible */
 .sidebar-right.open {
-    right: 0; /* Se muestra al agregar la clase 'open' */
+  right: 0;
 }
 
 @media (max-width: 600px) {
-    .sidebar-right {
-        width: 100%;
-    }
+  .sidebar-right {
+    width: 100%;
+  }
+}
+
+/* Botón para abrir/cerrar la sidebar */
+.toggle-sidebar-right-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000; 
+  background-color: #fc3434;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-right-btn:hover {
+  background-color: #45a049;
 }
 
 
 
 /* -------------- GRAFICOS ---------------------------- */
-/* Estilo para el canvas de las estadísticas */
+/* Estilo para el canvas de las estadísticas *//*
 #statsChart {
   width: 100%;
-  height: 250px; /* Limita la altura del gráfico */
+  height: 250px; /* Limita la altura del gráfico *//*
   max-height: 300px;
   background-color: #f5f5f5;
   border-radius: 8px;
 }
 
-/* Estilo adicional para el contenido dentro de las sidebars */
+/* Estilo adicional para el contenido dentro de las sidebars *//*
 .sidebar-right h2 {
   margin-top: 50px;
   font-size: 18px;
 }
 
-/* Estilo para los botones de abrir las sidebars */
+/* Estilo para los botones de abrir las sidebars *//*
 #openResultsBtn, #openStatsBtn {
   position: fixed;
   bottom: 20px;
   right: 20px;
   padding: 10px 20px;
-  background-color: #4CAF50;
+  background-color: #000000;
   color: white;
   border: none;
   border-radius: 5px;
@@ -137,11 +224,11 @@ html, body {
 #openResultsBtn:hover, #openStatsBtn:hover {
   background-color: #45a049;
 }
-
+*/
 /* -------------- ESCALA ---------------------------- */
 /* Estilos de la barra de escala */
 .ol-scale-bar {
-  background-color: rgba(158, 158, 155, 0); /* Fondo oscuro */
+  background-color: rgba(165, 165, 30, 0); /* Fondo oscuro */
   border-radius: 7px; /* Bordes redondeados */
   padding: 20px 9px; /* Espaciado interno */
   color: rgb(0, 0, 0); /* Texto blanco */
@@ -151,14 +238,14 @@ html, body {
 /* texto barra de la escala */
 .ol-scale-bar-text {
   font-weight: bold; /* Fuente en negrita */
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra en el texto */
+  text-shadow: 10px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra en el texto */
 }
 
 /* texto de la escala */
 .ol-scale-text {
   color: #000000;
   position:absolute;
-  top: 48px;
+  top: 0px;
   font-size: 16px; /* Tamaño de la fuente */
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
@@ -198,7 +285,7 @@ html, body {
   left: -250px; /* Oculta barra */
   width: 220px;
   height: 100%;
-  background: rgb(64, 67, 68);
+  background: #192431;
   color: white;
   padding: 20px;
   font-family: Arial, sans-serif;
@@ -230,19 +317,21 @@ html, body {
 #searchBtn {
   width: 100%;
   margin-top: 10px;
-  padding: 8px;
+  padding: 10px;
   border: none;
-  background: #080501;
-  color: white;
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
   font-size: 14px;
+  font-weight: bold;
   cursor: pointer;
   border-radius: 5px;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 #searchBtn:hover {
-  background: #1b4b25;
-  color:rgb(156, 223, 173);
-  font-weight: bold;
+  background: #2a9ca1;
+  color: #e0f7f9;
 }
 
 /* Resultados de búsqueda */
@@ -262,8 +351,8 @@ html, body {
 /* Estilo del select */
 #themeSelect {
   width: 100%;
-  padding: 8px;
-  border: none;
+  padding: 14px;
+  border: 2px solid #ffffff;
   background: #080501;
   color: white;
   font-size: 14px;
@@ -273,19 +362,62 @@ html, body {
 
 /* Efecto hover para el select */
 #themeSelect:hover {
-  background: #1b4b25;
-  color: rgb(156, 223, 173);
+  background: #000000;
+  color: rgb(255, 255, 255);
   font-weight: bold;
 }
 
 /* Efecto cuando el select está en foco (clicado) */
 #themeSelect:focus {
-  background: #1b4b25;
-  color: rgb(156, 223, 173);
+  background: #000000;
+  color: rgb(255, 255, 255);
   font-weight: bold;
   outline: none;
 }
 
+/* Estilos unificados para los inputs de la sidebar de búsqueda */
+.sidebar input,
+.sidebar select,
+.sidebar textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.sidebar input:focus,
+.sidebar select:focus,
+.sidebar textarea:focus {
+  outline: none;
+  border-color: #34b8c2;
+  box-shadow: 0 0 5px rgba(52, 184, 194, 0.5);
+}
+
+/* SIDEBAR DERECHA ---*/
+/* Estilo para el botón de mostrar/ocultar la sidebar derecha */
+/*.toggle-sidebar-btn {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000; 
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-sidebar-btn:hover {
+  background-color: #000000;
+}*/
 
 /* -------------- POPUP INFO ---------------------------- */
 /* Estilo para el contenedor del popup */
@@ -321,19 +453,39 @@ html, body {
   flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
 }
 
-.close-btn {
-  align-self: flex-end; /* Coloca el botón de cerrar en la esquina */
-  padding: 10px 20px;
-  background-color: rgb(64, 97, 167);
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
+.popup {
+        display: none; 
+        position: fixed; 
+        z-index: 1000; 
+        left: 10;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
 
-.close-btn:hover {
-  background-color: darkred;
-}
+      .popup-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 50%;
+        text-align: center;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      .close-btn {
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close-btn:hover {
+        color: rgb(58, 84, 168);
+      }
+
 
 /* -------------- POPUPS ---------------------------- */
 
@@ -369,17 +521,52 @@ html, body {
   border-radius: 10px;
 }
 
-.close-btn {
-  float: right;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
+/* Estilos para el popup de registro */
+.popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-.close-btn:hover {
-  color: Wred;
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  text-align: center;
 }
-*/
+
+.popup-content input,
+.popup-content select {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.popup-content button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.popup-content button:hover {
+  background-color: #45a049;
+}
 
 /* -------------- TABLETS ---------------------------- */ /*
 @media (max-width: 768px) {
@@ -401,6 +588,16 @@ html, body {
   overflow-y: auto;
 }
 
+/* Estilo para el contenedor de resultados con slider lateral */
+#popupResultsContent {
+  max-height: 80vh; /* Limitar la altura máxima */
+  overflow-y: auto; /* Habilitar el slider lateral */
+  padding: 10px; /* Espaciado interno */
+  background-color: #f9f9f9; /* Fondo claro */
+  border: 1px solid #ccc; /* Borde */
+  border-radius: 5px; /* Bordes redondeados */
+}
+
 #popupStats {
   position: absolute;
   top: 1%;
@@ -418,6 +615,23 @@ html, body {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+/* Estilo para dividir la sidebar en dos mitades */
+#popupResultsContent, #popupStatsContent {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#popupResultsContent {
+  border-bottom: 1px solid #ccc; /* Separador entre resultados y estadísticas */
+}
+
+/* Ajustar el tamaño de los gráficos */
+#pieChart, #barChart {
+  max-height: 200px;
+  width: 100%;
+}
+
 /* -------------- POPUP QUESITO ---------------------------- */
 #statsChart {
   width: 100%;
@@ -426,4 +640,298 @@ html, body {
 }
 
 /*-------------------------------*/
+
+/* Estilos para los botones de login y logout */
+.auth-buttons {
+  margin-top: 10px;
+}
+
+.auth-buttons button {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 2px 3px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.auth-buttons button:hover {
+  background-color: #000000;
+}
+
+/* Estilos para la sección de autenticación */
+.auth-section {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.auth-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  position: absolute;
+  top: 30px;
+  right: 150px;
+}
+
+.auth-section input {
+  padding: 8px;
+  font-size: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.auth-section button {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 3px 3px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.auth-section button:hover {
+  background: #d3d0d0;
+  color: #000000;
+  border: 2px solid #ffffff;
+}
+
+/* Estilos para el contenedor de usuario y rol */
+.user-info {
+  position: absolute;
+  top: 61px;
+  left: 1642px;
+  background-color: rgba(0, 0, 0, 0);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  text-align: right;
+}
+
+.user-info span {
+  display: block;
+}
+
+/* Estilos para la información del usuario y rol en la cabecera */
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 10px;
+  color: rgb(0, 0, 0);
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.user-info span {
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* Estilo para el formulario de agregar datos */
+#addDataForm {
+  display: none; /* Oculto por defecto */
+  flex-direction: column;
+  gap: 20px;
+  background-color: #000000;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  max-width: 400px;
+  color: #ccc;
+  font-family: Arial, sans-serif;
+  max-width: 600px; /* Aumentar el ancho máximo */
+  width: 90%; /* Asegurar que sea responsivo */
+}
+
+/* Título del formulario */
+#addDataForm h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  color: #ccc;
+}
+
+/* Sección de campos obligatorios */
+#addDataForm .required-section {
+  border: 1px solid #ccc;
+  background-color: #192431;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#addDataForm .required-section h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #ccc;
+}
+
+/* Sección de campos opcionales */
+#addDataForm .optional-section {
+  border: 1px solid #cccccc00;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+#addDataForm .optional-section h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-family: Arial, sans-serif;
+  color: #ccc;
+}
+
+/* Etiquetas */
+#addDataForm label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+}
+
+/* Campos de entrada */
+#addDataForm input,
+#addDataForm textarea,
+#addDataForm select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  background-color: black;
+  color: #ccc;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+/* Campos obligatorios destacados */
+#addDataForm input[required],
+#addDataForm select[required] {
+  border-left: 4px solid #4CAF50;
+}
+
+/* Botones */
+#addDataForm .button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+#addDataForm button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+#addDataForm #saveDataBtn {
+  background-color: #000000;
+  color: #ccc;
+}
+
+#addDataForm #saveDataBtn:hover {
+  background-color: #45a049;
+  transform: scale(1.05);
+}
+
+#addDataForm #cancelAddDataBtn {
+  background-color: #000000;
+  color: #ccc;
+}
+
+#addDataForm #cancelAddDataBtn:hover {
+  background-color: #e53935;
+  transform: scale(1.05);
+}
+
+/* Estilo para el botón "Añadir Datos" exclusivo de administradores */
+#addDataBtn {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  padding: 2px 3px;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  position: absolute;
+  top: 90px;
+  right: 375px; /* Ajusta la distancia desde el borde derecho */
+}
+
+#addDataBtn:hover {
+  color: #000000;
+  background-color: #d3d0d0;
+}
+
+/* Estilo para la sidebar fija de administrador */
+.admin-sidebar {
+  display: block; /* Cambiar a block cuando se activa */
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  height: 100%;
+  background-color: #f9f9f9;
+  border-left: 1px solid #ccc;
+  padding: 20px;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.admin-sidebar h2 {
+  font-size: 18px;
+  margin-bottom: 15px;
+}
+
+.admin-sidebar label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.admin-sidebar input,
+.admin-sidebar textarea {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.admin-sidebar button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.admin-sidebar button:hover {
+  background-color: #45a049;
+}
+
 

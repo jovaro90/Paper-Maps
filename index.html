@@ -31,26 +31,125 @@
     <header class="full-width-header">
       <div class="header-content">
         <h1>Paper Maps</h1>
-        <p>TFM Sistemas de Información Geográfica en Código Abierto.</p>
-        <button id="selectAreaBtn">Seleccionar Área</button>
-        <script src="your_script.js" defer></script>
-      </div>
+        <div class="header-buttons">
+          <div id="layerSwitcherContainer" class="header-btn"></div> <!-- Mover aquí -->
+          <button id="toggleSidebarBtn" class="header-btn">Mostrar Resultados</button>
+          <button id="selectAreaBtn" class="header-btn">Seleccionar Área</button>
+          <button id="toggleMinimapBtn" class="header-btn">Abrir Minimapa</button>
+        </div>
+        <div class="auth-section">
+          <input type="text" id="username" placeholder="Usuario" />
+          <input type="password" id="password" placeholder="Contraseña" />
+          <button id="loginBtn">Iniciar Sesión</button>
+          <button id="registerBtn">Registrarme</button>
+          <button id="logoutBtn" style="display: none;">Logout</button>
+        </div>
+        <!-- Botones exclusivos para el rol de administrador -->
+        <form id="adminButtons" style="display: none;">
+          <button id="addDataBtn">Añadir Datos</button>
+          <div id="addDataForm" style="display: none;">
+            <h3>Añadir Nuevos Datos</h3>
+            <div class="required-section">
+              <label for="addNombredatos">Nombre:</label>
+              <input type="text" id="addNombredatos" placeholder="Ingrese el nombre *" required />
+        
+              <label for="addTematicadatos">Temática:</label>
+              <select id="addTematicadatos" required>
+                <option value="urbanismo">Urbanismo</option>
+                <option value="ambiental">Ambiental</option>
+                <option value="ciencias">Ciencia</option>
+                <option value="tecnologia">Tecnología</option>
+                <option value="social">Social</option>
+                <option value="economia">Economía</option>
+              </select>
+        
+              <label for="addLatituddatos">Latitud:</label>
+              <input type="text" id="addLatituddatos" placeholder="Ingrese la latitud *" required />
+        
+              <label for="addLongituddatos">Longitud:</label>
+              <input type="text" id="addLongituddatos" placeholder="Ingrese la longitud *" required />
+        
+              <label for="addLinkdatos">Enlace:</label>
+              <input type="url" id="addLinkdatos" placeholder="Ingrese el enlace *" required />
+            </div>
+        
+            <div class="optional-section">
+              <label for="addUbicaciondatos">Ubicación:</label>
+              <input type="text" id="addUbicaciondatos" placeholder="Ingrese la ubicación (opcional)" />
+        
+              <label for="addAnio">Año:</label>
+              <input type="number" id="addAnio" placeholder="Ingrese el año (opcional)" />
+        
+              <label for="addPalabraClavedatos">Palabra Clave:</label>
+              <input type="text" id="addPalabraClavedatos" placeholder="Ingrese palabras clave (opcional)" />
+        
+              <label for="addDescripciondatos">Descripción:</label>
+              <textarea id="addDescripciondatos" placeholder="Ingrese la descripción (opcional)"></textarea>
+            </div>
+            <!-- Botones dentro del formulario -->
+            <button id="saveDataBtn" type="button">Guardar</button>
+            <button id="cancelAddDataBtn" type="button" onclick="hideAddDataForm()">Cancelar</button>
+          </div>
+        </form>
+            
+            <!-- Campos adicionales -->
+            
+            
+           
+          </div>
+        </div>
+
+        </div>
+        <!-- Información del usuario y rol -->
+        <div id="userInfo" style="display: none;">
+  <span id="userDisplayName"></span>
+  <span id="userRoleDisplay"></span>
+</div>
+
+<div id="adminSidebar" style="display: none;">
+  <!-- Contenido exclusivo para administradores -->
+</div>
+
+<div id="adminButtons" style="display: none;">
+  <button id="addDataBtn">Añadir Datos</button>
+</div>
     </header>
 
     
     <!-- Contenedor de la mapa -->
     <div class="container"></div>
-    <div class="map" id="map"></div>
+    <div id="map" class="map"></div>
 
     <!-- Sidebar de salida de resultados de los estudios -->
     <div id="sidebarResults" class="sidebar-right">
-      <h2>Resultados de Búsqueda</h2>
-      <div id="popupResultsContent"></div>
-      <h4>Proyectos por Temática</h4>
-        <canvas id="pieChart"></canvas>
-        <h4>Proyectos por Año (en la temática seleccionada)</h4>
-        <canvas id="barChart"></canvas>
+      <div style="display: flex; flex-direction: column; height: 100%;">
+        <!-- Contenedor de resultados -->
+        <div id="popupResultsContent" style="flex: 1; overflow-y: auto; padding: 10px; border-bottom: 1px solid #ccc;">
+          <h2>Resultados de Búsqueda</h2>
+        </div>
+        <!-- Contenedor de estadísticas -->
+        <div id="popupStatsContent" style="flex: 1; overflow-y: auto; padding: 10px;">
+          <h2>Estadísticas</h2>
+        </div>
+      </div>
     </div>
+
+    <!-- Botón para mostrar/ocultar el sidebar -->
+    <button id="toggleSidebarResultsBtn" onclick="toggleSidebarResults()">Ocultar Resultados</button>
+
+    <script>
+      function toggleSidebarResults() {
+        const sidebar = document.getElementById('sidebarResults');
+        const button = document.getElementById('toggleSidebarResultsBtn');
+        if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+          sidebar.style.display = 'block';
+          button.textContent = 'Ocultar Resultados';
+        } else {
+          sidebar.style.display = 'none';
+          button.textContent = 'Mostrar Resultados';
+        }
+      }
+    </script>
 
  <!-- Popup info punto -->
       <!-- Contenedor principal para el popup -->
@@ -58,21 +157,10 @@
   <div id="popupInfo">
     <div id="popupInfoContent">
       <!-- Contenido del popup -->
-      <p>Este es un ejemplo de contenido dentro del popup.</p>
     </div>
     <button id="closePopup" class="close-btn">Cerrar</button>
   </div>
 </div>
-
-<!-- Popup clicar puntos -->
-      <div id="popupContainer" style="display: none; position: absolute; background-color: white; padding: 10px; border: 1px solid black; border-radius: 5px;">
-        <div id="popupResultsContent"></div>
-      </div>
-      <div id="popupStats" class="popup-stats">
-        <span class="close-btn" onclick="closePopup('popupStats')">&times;</span>
-      </div>
-    </div>
-
     <!-- Sidebar de Búsqueda -->
     <div class="sidebar-container">
       <div class="sidebar">
@@ -113,51 +201,79 @@
       </div>
     </div>
 
+
+
+<!----------- ROL USUARIOS ------------------>
+
+  <!-- Botones restringidos por roles -->
+  <div id="roleActions">
+    <button id="editBtn">Editar</button>
+    <button id="deleteBtn">Eliminar</button>
+    <button id="viewStatsBtn">Ver Estadísticas</button>
+  </div>
+
+  <!-- Selector de rol de usuario -->
+  <div id="roleSelector">
+    <label for="userRole">Seleccionar Rol:</label>
+    <select id="userRole">
+      <option value="admin">Administrador</option>
+      <option value="user">Editor</option>
+      <option value="viewer" >Visualizador</option>
+    </select>
+  </div>
+
+    <!-- Popup de registro -->
+    <div id="registerPopup" class="popup" style="display: none;">
+      <div class="popup-content">
+        <h2>Registro de Usuario</h2>
+        <label for="registerUsername">Usuario:</label>
+        <input type="text" id="registerUsername" placeholder="Ingrese su usuario" />
+        <label for="registerPassword">Contraseña:</label>
+        <input type="password" id="registerPassword" placeholder="Ingrese su contraseña" />
+        <label for="repeatPassword">Repetir Contraseña:</label>
+        <input type="password" id="repeatPassword" placeholder="Repita su contraseña" />
+        <label for="userRole">Rol:</label>
+        <select id="userRole">
+          <option value="admin">Administrador</option>
+          <option value="user">Editor</option>
+        </select>
+        <button id="submitRegisterBtn">Registrar</button>
+        <button id="cancelRegisterBtn">Cancelar</button>
+      </div>
+    </div>
+
+    <!-- Formulario de agregar datos -->
+    <div id="addDataForm" style="display: none; flex-direction: column; gap: 10px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <h3>Añadir Nuevo Dato</h3>
+      <label for="addNombre">Nombre:</label>
+      <input type="text" id="addNombre" placeholder="Ingrese el nombre" />
+      <label for="addUbicacion">Ubicación:</label>
+      <input type="text" id="addUbicacion" placeholder="Ingrese la ubicación" />
+      <label for="addTematica">Temática:</label>
+      <input type="text" id="addTematica" placeholder="Ingrese la temática" />
+      <label for="addAnio">Año:</label>
+      <input type="number" id="addAnio" placeholder="Ingrese el año" />
+      <label for="addPalabraClave">Palabra Clave:</label>
+      <input type="text" id="addPalabraClave" placeholder="Ingrese palabras clave" />
+      <label for="addLatitud">Latitud:</label>
+      <input type="text" id="addLatitud" placeholder="Ingrese la latitud" />
+      <label for="addLongitud">Longitud:</label>
+      <input type="text" id="addLongitud" placeholder="Ingrese la longitud" />
+      <label for="addLink">Enlace:</label>
+      <input type="text" id="addLink" placeholder="Ingrese el enlace" />
+      <label for="addDescripcion">Descripción:</label>
+      <textarea id="addDescripcion" placeholder="Ingrese la descripción"></textarea>
+      <label for="addLink">Enlace:</label>
+      <input type="url" id="addLink" placeholder="Ingrese el enlace (opcional)" />
+      <button id="saveDataBtn">Guardar</button>
+      <button onclick="hideAddDataForm()">Cancelar</button>
+    </div>
+
     <!-- Librería Chart.js para gráficos -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Vinculo con el archivo JS principal -->
     <script type="module" src="./main.js"></script>
-
-    <!-- Estilos del Popup -->
-    <style>
-      .popup {
-        display: none; 
-        position: fixed; 
-        z-index: 1000; 
-        left: 10;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-      }
-
-      .popup-content {
-        background-color: white;
-        margin: 10% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 50%;
-        text-align: center;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
-      }
-
-      .close-btn {
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-      }
-
-      .close-btn:hover {
-        color: rgb(58, 84, 168);
-      }
-
-      /* Estilos para la cabecera */
-    
-      
-    </style>
 
     <!-- Scripts para la lógica de apertura/cierre de popups y sidebars -->
     <script>

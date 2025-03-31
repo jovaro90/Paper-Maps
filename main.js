@@ -1,4 +1,4 @@
-/*-------------       1.LIBRERIAS       ---------------*/
+/*-------------       1.LIBRERIAS        ---------------*/
 
 import './style.css';
 import "ol-layerswitcher/dist/ol-layerswitcher.css";
@@ -7,30 +7,77 @@ import {Map, View} from 'ol';
 import {OSM, TileWMS, Vector as VectorSource} from 'ol/source'; //teselado
 import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer'; //vectorial
 import { fromLonLat } from 'ol/proj';
-import GeoJSON from 'ol/format/GeoJSON';
 import sync from 'ol-hashed'; // añade a la url el centro del mapa
-import { Feature } from 'ol';
 import { Style, Icon } from 'ol/style';
-import Fill from 'ol/style/Fill';
-import Stroke from 'ol/style/Stroke';
-import Text from 'ol/style/Text';
 import Overlay from 'ol/Overlay';
+import {format} from "ol/coordinate";
 //librerias Controles
-import { defaults as defaultControls} from "ol/Control";
+import { defaults as defaultControls, MousePosition} from "ol/Control";
 import { OverviewMap } from 'ol/Control';
 import { ScaleLine } from 'ol/Control';
-import { MousePosition } from 'ol/Control';
-import { ZoomToExtent } from 'ol/Control';
-import { FullScreen } from 'ol/Control';
-import { Control } from 'ol/Control';
-// librerias coordenadas puntero
-import { format } from 'ol/coordinate'; 
-import { transformExtent } from 'ol/proj';
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
+import Draw from 'ol/interaction/Draw';
+import { Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 
+// MODULOS:
+// importar CSV datos
+import { loadCSVData, filterCSVData, processCSVData } from './modules/csvHandler.js';
+//sidebar derecha resultados
+import { displaySearchResults, closePopup, generateStatistics, } from './modules/sidebarResults.js';
+//login usuarios
+import { 
+  loadUsersFromCSV, 
+  loginUser, 
+  logoutUser, 
+  loadLoggedInUser, 
+  openRegisterPopup, 
+  closeRegisterPopup, 
+  submitRegistration,
+  setUserRole,
+  initializeRoleAndSidebarEvents, 
+  
+} from './modules/login.js';
 
+// Cargar el usuario al iniciar la página
+window.onload = function () {
+  loadLoggedInUser();
+
+  // Inicializar eventos relacionados con roles y sidebars
+  initializeRoleAndSidebarEvents();
+
+  // Vincular botones de autenticación
+  const loginBtn = document.getElementById('loginBtn');
+  if (loginBtn) loginBtn.addEventListener('click', loginUser);
+
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) logoutBtn.addEventListener('click', logoutUser);
+
+  const registerBtn = document.getElementById('registerBtn');
+  if (registerBtn) registerBtn.addEventListener('click', openRegisterPopup);
+
+  const submitRegisterBtn = document.getElementById('submitRegisterBtn');
+  if (submitRegisterBtn) {
+    submitRegisterBtn.addEventListener('click', submitRegistration);
+  }
+
+  const cancelRegisterBtn = document.getElementById('cancelRegisterBtn');
+  if (cancelRegisterBtn) {
+    cancelRegisterBtn.addEventListener('click', closeRegisterPopup);
+  }
+};
+
+import { showAddDataForm, hideAddDataForm, addNewData } from './modules/datos.js';
+
+// Vincular el botón "Añadir Datos" al formulario
+document.getElementById('addDataBtn').addEventListener('click', showAddDataForm);
+
+// Vincular el botón "Cancelar" del formulario de añadir datos
+document.getElementById('cancelAddDataBtn').addEventListener('click', hideAddDataForm);
+
+// Vincular el botón "Guardar" del formulario de añadir datos
+document.getElementById('saveDataBtn').addEventListener('click', () => addNewData(csvData));
 /*-------------       2.CONTROLES Y CONFIGURACION DEL MAPA       ---------------*/
 
 // 2.2 Escala
@@ -52,59 +99,38 @@ const OverviewMapControl = new OverviewMap ({
     ],
   });
 
+  // coordenadas puntero
+const mousePositionControl = new MousePosition({
+  coordinateFormat: (coordinate) => {
+    return format(coordinate, "Lat: {y}, Long {x}", 4); // Formato de coordenadas
+  },
+  projection: "EPSG:4326", // Proyección de las coordenadas
+  className: "coordinate_display",
+});
+  
   
 // variable controles extendida:
 const extendControls = [
   OverviewMapControl,
   scaleControl2,
+  mousePositionControl,
 ];
 
 
-/*-------------       3.CARGAR CSV Y FILTRAR RESULTADOS      ---------------*/
 
-// Cargar el archivo CSV desde el directorio público
-fetch('/buscador.csv')
-  .then(response => response.text())  // Obtener el archivo como texto
-  .then(csvText => {
-    // Usar PapaParse para convertir el texto CSV a un array de objetos JSON
-    Papa.parse(csvText, {
-      header: true,  // el CSV tiene cabecera
-      complete: function(results) {
-        console.log('Datos CSV:', results.data);
-        // Almacenar los datos CSV en una variable global o en el estado
-        window.csvData = results.data;
-      }
-    });
-  })
-  .catch(error => {
-    console.error('Error al cargar el archivo CSV:', error);
-    if (!window.csvData || window.csvData.length === 0) {
-      console.error('Los datos CSV aún no están disponibles.');
-      return;
-    }
-  
+/*-------------       MODULO 1.CARGAR CSV Y FILTRAR RESULTADOS      ---------------*/
 
-    /*-------------       4.MOSTRAR RESULTADOS EN MAPA       ---------------*/
-    const filteredResults = window.csvData
-    .filter(item => item.ubicacion && item.tematica && item.anio && item.palabraclave) // Filtrar objetos inválidos
-    .filter(item => {
-      const ubicacion = item.ubicacion.toLowerCase();
-      const tematica = item.tematica.toLowerCase();
-      const descripcion = item.palabraclave ? item.palabraclave.toLowerCase() : '';
-  
-      const matchesLocation = ubicacion.includes(location);
-      const matchesTheme = theme ? tematica === theme : true;
-      const matchesYear = year ? item.anio === year : true;
-      const matchesKeyword = keyword ? descripcion.includes(keyword) : true;
-  
-      return matchesLocation && matchesTheme && matchesYear && matchesKeyword;
-    });
-  });
+// Cargar y filtrar datos CSV
+let csvData = [];
+let filteredResults = []; // Declarar la variable global para almacenar los resultados filtrados
+let representedPoints = []; // Variable global para almacenar los puntos representados
 
-  
-// Filtrar los datos como antes (basado en las entradas del usuario)
-document.getElementById('searchBtn').addEventListener('click', function() {
-  if (!window.csvData || window.csvData.length === 0) {
+loadCSVData().then(data => {
+  csvData = data;
+});
+
+document.getElementById('searchBtn').addEventListener('click', function () {
+  if (!csvData || csvData.length === 0) {
     console.error('Los datos CSV aún no están disponibles o están vacíos.');
     return;
   }
@@ -114,61 +140,52 @@ document.getElementById('searchBtn').addEventListener('click', function() {
   const year = document.getElementById('yearFilter').value;
   const keyword = document.getElementById('searchBox').value.toLowerCase();
 
-  const filteredResults = window.csvData.filter(item => {
-    // Verificar que el objeto tenga las propiedades necesarias
-    if (!item.ubicacion || !item.tematica || !item.anio || !item.palabraclave) {
-      console.warn('Objeto inválido encontrado y omitido:', item);
-      return false;
-    }
-
-    // Convertir valores a minúsculas y asegurarse de que existen
-    const ubicacion = item.ubicacion ? item.ubicacion.toLowerCase() : '';
-    const tematica = item.tematica ? item.tematica.toLowerCase() : '';
-    const descripcion = item.palabraclave ? item.palabraclave.toLowerCase() : '';
-
-    const matchesLocation = ubicacion.includes(location);
-    const matchesTheme = theme ? tematica === theme : true;
-    const matchesYear = year ? item.anio === year : true;
-    const matchesKeyword = keyword ? descripcion.includes(keyword) : true;
-
-    return matchesLocation && matchesTheme && matchesYear && matchesKeyword;
-  });
+  // Filtrar los datos según los criterios del usuario
+  filteredResults = filterCSVData(csvData, location, theme, year, keyword);
 
   // Mostrar los resultados filtrados
   document.getElementById('resultCount').textContent = `Resultados encontrados: ${filteredResults.length}`;
   displaySearchResults(filteredResults);
 
-
-  /*-------------       5.CLICAR PUNTOS MAPA Y DAR INFO      ---------------*/
-  // Agregar puntos filtrados al mapa
+  // Agregar los puntos filtrados al mapa
   addFilteredPointsToMap(filteredResults);
-  
+});
 
+/*--------------CLICAR PUNTOS MAPA Y DAR INFO-------------------------- */
 // Función para agregar los puntos filtrados al mapa
 function addFilteredPointsToMap(filteredResults) {
-  // Crear una fuente vectorial para los puntos filtrados
   const vectorSource = new VectorSource();
+  representedPoints = []; // Reiniciar la variable antes de agregar nuevos puntos
 
-// Crear el Overlay que actuará como el popup
-const popupContainer = document.getElementById('popupContainer');
-const popupResults = document.getElementById('popupInfo');
-const popupContent = document.getElementById('popupInfoContent');
-const overlay = new Overlay({
-  element: popupContainer, // Elemento del popup
-  autoPan: true, // Para que el mapa se mueva para mostrar el popup
-  autoPanAnimation: {
-    duration: 250, // Duración de la animación de desplazamiento
-  },
-});
-map.addOverlay(overlay); // Añadir el overlay al mapa
+  // Crear el Overlay que actuará como el popup
+  const popupContainer = document.getElementById('popupContainer');
+  const popupContent = document.getElementById('popupInfoContent');
+  const overlay = new Overlay({
+    element: popupContainer,
+    autoPan: true,
+    autoPanAnimation: {
+      duration: 250,
+    },
+  });
 
-  // Iterar sobre los resultados filtrados para agregar puntos al vectorSource
+  // Función para cerrar el popup
+  function closePopup() {
+    popupContainer.style.display = 'none';
+    overlay.setPosition(undefined);
+  }
+
+  const closePopupButton = document.getElementById('closePopupButton');
+  if (closePopupButton) {
+    closePopupButton.addEventListener('click', closePopup);
+  }
+  map.addOverlay(overlay);
+
+  // Iterar sobre los resultados filtrados para agregar puntos al mapa
   filteredResults.forEach(item => {
-    const lat = parseFloat(item.Latitud); // Obtener latitud
-    const lon = parseFloat(item.Longitud); // Obtener longitud
+    const lat = parseFloat(item.Latitud);
+    const lon = parseFloat(item.Longitud);
 
     if (!isNaN(lat) && !isNaN(lon)) {
-      // Crear un punto con las coordenadas
       const point = new ol.Feature({
         geometry: new ol.geom.Point(fromLonLat([lon, lat])),
         name: item.Nombre,
@@ -176,43 +193,39 @@ map.addOverlay(overlay); // Añadir el overlay al mapa
         link: item.link,
       });
 
-      // Establecer el estilo del punto (marcador)
       point.setStyle(new Style({
         image: new Icon({
           anchor: [0.5, 1],
-          src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // ícono de marcador
+          src: 'https://cdn-icons-png.flaticon.com/512/684/684908.png',
           scale: 0.05,
-        })
+        }),
       }));
-      console.log(filteredResults);
-      
-      // Añadir el punto al vectorSource
+
       vectorSource.addFeature(point);
+      representedPoints.push(point); // Agregar el punto a la lista global
     }
   });
 
-  // Crear una capa vectorial
   const vectorLayer = new VectorLayer({
-    source: vectorSource
+    source: vectorSource,
   });
-
 
   map.addLayer(vectorLayer);
 
+
   // Evento de selección de puntos
   const selectInteraction = new ol.interaction.Select({
-    condition: ol.events.condition.click, // Evento click en el mapa
+    condition: ol.events.condition.click,
   });
 
   selectInteraction.on('select', function (event) {
-    const selectedFeature = event.selected[0]; // Obtiene la característica seleccionada
+    const selectedFeature = event.selected[0];
 
     if (selectedFeature) {
       const name = selectedFeature.get('name');
       const description = selectedFeature.get('descripcion');
       const link = selectedFeature.get('link');
 
-      // Muestra la información en el popup
       popupContent.innerHTML = `
         <h3>${name}</h3>
         <p>${description}</p>
@@ -223,347 +236,200 @@ map.addOverlay(overlay); // Añadir el overlay al mapa
     }
   });
 
-  map.addInteraction(selectInteraction); // Agregar la interacción de selección al mapa
+  map.addInteraction(selectInteraction);
 }
-/*      ___________________
-        || INFO AL CLICAR||
-        ||____POPUPS_____||      
-______________________________________________________________________________________________*/
-// Función para mostrar los resultados de búsqueda en un popup
-// Función para abrir el popup
-function openPopup() {
-  document.getElementById('popupContainer').style.display = 'flex'; // Mostramos el contenedor del popup
-}
-// Función para cerrar el popup
-function closePopup() {
-  const popupContainer = document.getElementById('popupContainer');
-  if (popupContainer) {
-    popupContainer.style.display = 'none'; // Ocultar el contenedor del popup
+
+/*--------------SELECCIONAR ÁREA-------------------------- */
+// Función para actualizar la barra lateral con los puntos seleccionados
+// Función para actualizar la barra lateral con los puntos seleccionados
+function updateSidebarWithSelectedPoints(points) {
+  const sidebar = document.getElementById('sidebarResults');
+  const resultsContainer = document.getElementById('popupResultsContent'); // Contenedor de resultados
+
+  if (!resultsContainer) {
+    console.error('El contenedor de resultados (popupResultsContent) no se encontró en el DOM.');
+    return;
   }
-}
-    
-// Cerrar el popup cuando se haga clic en la "X"
-document.querySelector('.close-btn').addEventListener('click', function() {
-  closePopup('popupInfo'); // Aquí se llama a la función closePopup
-});
-  
- // Cerrar el popup si se hace clic fuera de él
-window.addEventListener('click', function(event) {
-  const popup = document.getElementById('popupResults');
-  if (event.target === popup) {
-    closePopup(); // llamar a closePopup si se hace clic fuera del popup
+
+  // Limpiar los resultados anteriores
+  resultsContainer.innerHTML = '';
+
+  if (points.length === 0) {
+    resultsContainer.innerHTML = '<p>No hay puntos dentro del área seleccionada.</p>';
+    return;
   }
-  });
-});
 
-function displaySearchResults(results) {
-    const popupContainer = document.getElementById('popupContainer');
-    const popupResults = document.getElementById('popupResults');
-    const popupContent = document.getElementById('popupResultsContent');
+  // Crear una lista de los puntos seleccionados
+  const list = document.createElement('ul');
+  points.forEach(point => {
+    // Manejar tanto objetos simples como instancias de ol.Feature
+    const name = point.Nombre || point.get?.('name') || 'Sin nombre';
+    const description = point.descripcion || point.get?.('descripcion') || 'Sin descripción';
+    const link = point.link || point.get?.('link') || '#';
 
-    popupContent.innerHTML = ''; // Limpiar contenido previo
-
-    if (results.length === 0) {
-        popupContent.innerHTML = '<p>No se encontraron resultados.</p>';
-    } else {
-        results.forEach(result => {
-            const div = document.createElement('div');
-            div.style.marginBottom = "15px";
-            div.style.display = "flex"; // Usamos flex para alinear la imagen y el texto en una fila
-            div.style.alignItems = "center"; // Alineamos verticalmente la imagen y el texto
-
-            const imageContainer = document.createElement('div');
-            imageContainer.style.marginRight = "15px"; // Espacio entre la imagen y el texto
-
-            // Verificar si hay una imagen en el enlace de la web
-            if (result.link) {
-              // Crear un contenedor de imagen
-              const img = document.createElement('img');
-              img.src = `https://www.google.com/s2/favicons?domain=${new URL(result.link).hostname}`; // Favicon de la web
-              img.alt = `Imagen de ${result.Nombre}`;
-              img.style.width = "50px"; // Ancho de la imagen
-              img.style.height = "50px"; // Alto de la imagen
-              img.style.borderRadius = "50%"; // Forma circular
-
-              // Añadir la imagen al contenedor
-              imageContainer.appendChild(img);
-            }
-
-            // Crear el contenedor para el texto
-            const textContainer = document.createElement('div');
-            textContainer.style.display = "flex";
-            textContainer.style.flexDirection = "column"; // Aseguramos que el texto esté alineado verticalmente
-
-            const title = document.createElement('h3');
-            title.textContent = result.Nombre || "Sin nombre";
-
-            const details = document.createElement('p');
-            details.innerHTML = `
-            <i class="fas fa-map-marker-alt"></i> Ubicación: ${result.ubicacion} |
-            <i class="fas fa-theater-masks"></i> Temática: ${result.tematica} |
-            <i class="fas fa-calendar-alt"></i> Año: ${result.anio}`;
-
-             // Descripción antes del enlace
-            const description = document.createElement('p');
-            description.textContent = result.descripcion || "No hay descripción disponible.";
-
-            const link = document.createElement('a');
-            if (result.link) {
-                link.href = result.link;
-                link.textContent = "🔗 Link";
-                link.target = "_blank";
-                link.style.display = "block";
-                link.style.marginTop = "5px";
-            } else {
-                link.textContent = "🔗 No hay enlace disponible";
-                link.style.color = "gray";
-                link.style.cursor = "default";
-            }
-            
-            div.appendChild(title);
-            div.appendChild(details);
-            div.appendChild(description);
-            div.appendChild(link);
-            popupContent.appendChild(div);
-
-            // Añadir la imagen y el texto al div principal
-            div.appendChild(imageContainer); // Imagen a la izquierda
-            div.appendChild(textContainer); // Texto a la derecha
-            popupContent.appendChild(div);
-        });
-    }
-
-  
-    popupContainer.style.display = 'flex'; // Mostrar ambos popups juntos
-    popupInfo.style.display = 'block';
-
-    generateStatistics(results); // Generar estadísticas
-}
-/*      _______________
-        || RESULTADOS||
-        ||__GRAFICOS_||      
-______________________________________________________________________________________________*/
-function closePopup(popupId) {
-  document.getElementById(popupId).style.display = 'none';
-
-  // Si se cierra uno, cerramos ambos
-  if (popupId === 'popupResults' || popupId === 'popupStats') {
-      document.getElementById('popupContainer').style.display = 'none';
-  }
-}
-
-// Cerrar los popups al hacer clic fuera
-window.addEventListener('click', function(event) {
-  const popupContainer = document.getElementById('popupContainer');
-  if (event.target === popupContainer) {
-      closePopup('popupResults');
-      closePopup('popupStats');
-  }
-});
-
-function generateStatistics(results) {
-  const popupStats = document.getElementById('popupStats');
-  popupStats.style.display = 'block';
-
-  // Conteo de temáticas y años
-  let themesCount = {};
-  let yearsCount = {};
-  let selectedTheme = document.getElementById('themeSelect').value.toLowerCase();
-
-  // Filtrar los resultados para que solo incluyan la temática seleccionada
-  results.forEach(result => {
-    if (result.tematica) {
-      themesCount[result.tematica] = (themesCount[result.tematica] || 0) + 1;
-    }
-    if (result.anio) {
-      yearsCount[result.anio] = (yearsCount[result.anio] || 0) + 1;
-    }
+    const listItem = document.createElement('li');
+    listItem.innerHTML = `
+      <h4>${name}</h4>
+      <p>${description}</p>
+      <a href="${link}" target="_blank">Más información</a>
+    `;
+    list.appendChild(listItem);
   });
 
-  const themeLabels = Object.keys(themesCount);
-  const themeValues = Object.values(themesCount);
+  resultsContainer.appendChild(list);
 
-  // Total de proyectos de todas las temáticas (solo los resultados filtrados)
-  const totalProjects = themeValues.reduce((sum, value) => sum + value, 0); 
-
-  const yearLabels = Object.keys(yearsCount);
-  const yearValues = Object.values(yearsCount);
-
-  const ctxPie = document.getElementById('pieChart').getContext('2d');
-  const ctxBar = document.getElementById('barChart').getContext('2d');
-
-  // Si ya existe una instancia de los gráficos, la destruimos antes de crear una nueva
-  if (window.pieChart instanceof Chart) {
-    window.pieChart.destroy();
-  }
-  if (window.barChart instanceof Chart) {
-    window.barChart.destroy();
-  }
-
-  // Gráfico de Pastel (Quesito) para Temáticas
-  window.pieChart = new Chart(ctxPie, {
-    type: 'pie',
-    data: {
-      labels: themeLabels,
-      datasets: [{
-        label: 'Proyectos por Temática',
-        data: themeValues,
-        backgroundColor: ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33A1'], // colores diferentes
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: function(tooltipItem) {
-              // Calcular el porcentaje y formatearlo con respecto al total de proyectos
-              const percentage = ((tooltipItem.raw / totalProjects) * 100).toFixed(2);
-              return tooltipItem.label + ': ' + percentage + '%'; // Muestra el porcentaje
-            }
-          }
-        },
-        legend: {
-          position: 'top',
-        },
-      },
-    }
-  });
-
-  // Filtrar los resultados por temática seleccionada
-  const filteredResults = results.filter(result => result.tematica.toLowerCase() === selectedTheme);
-
-  // Gráfico de Barras para los Años dentro de la Temática Seleccionada
-  let filteredYearsCount = {};
-  filteredResults.forEach(result => {
-    if (result.anio) {
-      filteredYearsCount[result.anio] = (filteredYearsCount[result.anio] || 0) + 1;
-    }
-  });
-
-  const filteredYearLabels = Object.keys(filteredYearsCount);
-  const filteredYearValues = Object.values(filteredYearsCount);
-
-  // Si no hay datos para la temática seleccionada, mostrar un mensaje
-  if (filteredYearLabels.length === 0) {
-    alert(`No hay proyectos en el año para la temática: ${selectedTheme}`);
-  } else {
-    window.barChart = new Chart(ctxBar, {
-      type: 'bar',
-      data: {
-        labels: filteredYearLabels,
-        datasets: [{
-          label: 'Proyectos por Año',
-          data: filteredYearValues,
-          backgroundColor: '#3357FF',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
+  // Mostrar la barra lateral si está oculta
+  if (!sidebar.classList.contains('open')) {
+    sidebar.classList.add('open');
+    document.getElementById('toggleSidebarResultsBtn').textContent = 'Ocultar Resultados';
   }
 }
-
-/*-------------       7.AREA DE SELECCION      ---------------*/
-// Variable global para el vectorLayer que contiene el área seleccionada
-let drawInteraction = null;
-
-// Función para activar el control de dibujo
-function activateDrawing() {
-  // Crear una nueva capa vectorial para la selección
-  const vectorSource = new VectorSource();
-  const vectorLayer = new VectorLayer({
-    source: vectorSource,
-  });
-
-  // Crear el control de dibujo para el polígono
-  drawInteraction = new ol.interaction.Draw({
-    source: vectorSource,
+// Función para habilitar el dibujo de un área
+function enableAreaSelection() {
+  const drawInteraction = new Draw({
+    source: new VectorSource(),
     type: 'Polygon',
   });
 
-  // Agregar el control de dibujo al mapa
   map.addInteraction(drawInteraction);
 
-  // Cuando se complete el dibujo, capturamos el polígono
   drawInteraction.on('drawend', function (event) {
-    const feature = event.feature;
-    const geometry = feature.getGeometry();
-    const coordinates = geometry.getCoordinates();
+    const areaPolygon = event.feature.getGeometry();
+    // Primero, actualizar representedPoints
+  representedPoints = representedPoints.filter(point => 
+    areaPolygon.intersectsCoordinate(point.getGeometry().getCoordinates())
+  );
+  console.log('Puntos representados actualizados:', representedPoints);
 
-    // Llamar a una función para filtrar los puntos de acuerdo con el área seleccionada
-    filterResultsByArea(coordinates);
+    // Filtrar puntos dentro del área seleccionada
+  const pointsInArea = representedPoints.filter(point => {
+    const pointCoordinates = point.getGeometry().getCoordinates(); 
+    return areaPolygon.intersectsCoordinate(pointCoordinates); // 🛠 Verificar intersección
   });
+
+    console.log('Puntos seleccionados dentro del área:', pointsInArea);
+// Solo actualizar la barra lateral si hay puntos seleccionados
+if (pointsInArea.length > 0) {
+  updateSidebarWithSelectedPoints(pointsInArea);
+} else {
+  console.warn('No se encontraron puntos dentro del área seleccionada.');
 }
 
-// Función para detener el control de dibujo
-function deactivateDrawing() {
-  if (drawInteraction) {
+map.removeInteraction(drawInteraction);
+    // Actualizar `filteredResults` eliminando los puntos fuera del área
+filteredResults = filteredResults.filter(item => {
+  const pointCoordinates = fromLonLat([parseFloat(item.Longitud), parseFloat(item.Latitud)]);
+  return areaPolygon.intersectsCoordinate(pointCoordinates);
+}).map(item => ({
+  Nombre: item.Nombre || 'Sin nombre',
+  descripcion: item.descripcion || 'Sin descripción',
+  link: item.link || '#',
+  Latitud: item.Latitud,
+  Longitud: item.Longitud,
+}));
+
+    // Actualizar `representedPoints` eliminando los puntos fuera del área
+    representedPoints = representedPoints.filter(point => {
+      const pointCoordinates = point.getGeometry().getCoordinates();
+      return areaPolygon.intersectsCoordinate(pointCoordinates);
+    });
+
+    console.log('Resultados filtrados actualizados:', filteredResults);
+
+    // Cambiar el estilo de los puntos seleccionados
+    pointsInArea.forEach(point => {
+      point.setStyle(new Style({
+        image: new CircleStyle({
+          radius: 6,
+          fill: new Fill({
+            color: '#FF9800', // Cambiar el color para los puntos seleccionados
+          }),
+          stroke: new Stroke({
+            color: '#000000',
+            width: 2,
+          }),
+        }),
+      }));
+    });
+
+    console.log('Puntos seleccionados antes de actualizar la barra lateral:', pointsInArea);
+    // Actualizar la barra lateral con los puntos seleccionados
+    updateSidebarWithSelectedPoints(pointsInArea);
+
+    // Eliminar la interacción de dibujo después de completar el área
     map.removeInteraction(drawInteraction);
-    drawInteraction = null;
-  }
-}
-
-// Evento del botón para activar la selección del área
-document.getElementById('selectAreaBtn').addEventListener('click', function () {
-  if (drawInteraction) {
-    deactivateDrawing(); // Desactivar el dibujo si ya está activado
-  } else {
-    activateDrawing(); // Activar el dibujo
-  }
-});
-// Variable para almacenar la capa que contendrá los puntos filtrados
-let filteredPointsLayer = null;
-
-// Función para filtrar los resultados dentro del área seleccionada
-function filterResultsByArea(areaCoordinates) {
-  // Convertir las coordenadas del área a un formato adecuado
-  const polygon = new ol.geom.Polygon([areaCoordinates]);
-
-  // Asegurarse de que las coordenadas del polígono estén en el mismo sistema de coordenadas que el mapa
-  polygon.transform('EPSG:4326', 'EPSG:3857');  // Transformar de EPSG:4326 a EPSG:3857
-
-  // Filtrar los resultados de CSV (o cualquier fuente de datos) que estén dentro del área
-  const filteredResults = window.csvData.filter(item => {
-    const lat = parseFloat(item.Latitud);  // Obtener la latitud
-    const lon = parseFloat(item.Longitud); // Obtener la longitud
-
-    // Validar si las coordenadas son válidas
-    if (isNaN(lat) || isNaN(lon)) return false;
-
-    // Mostrar las coordenadas para depuración
-    console.log('Punto a verificar:', lat, lon);
-
-    // Convertir las coordenadas del punto a EPSG:3857
-    const point = new ol.geom.Point(ol.proj.fromLonLat([lon, lat]));
-
-    // Verificar si el punto está dentro del polígono
-    const insidePolygon = polygon.intersectsCoordinate(point.getCoordinates());
-
-    // Mostrar si el punto está dentro del polígono para depuración
-    console.log('Está el punto dentro del polígono?', insidePolygon);
-
-    return insidePolygon;
   });
-
-  // Mostrar los resultados filtrados en la consola (para depuración)
-  console.log('Puntos dentro del área:', filteredResults);
-
-  // Mostrar los resultados filtrados en la interfaz
-  displaySearchResults(filteredResults);
-  
-  // Agregar los puntos filtrados al mapa
-  addFilteredPointsToMap(filteredResults);
 }
 
+// Vincular la funcionalidad de selección de área a un botón
+document.getElementById('selectAreaBtn').addEventListener('click', enableAreaSelection);
+/*      _______________
+        ||   ROLES   ||
+        ||__USUARIO__||      
+______________________________________________________________________________________________*/
+
+/*-------------       8.ROLES DE USUARIO       ---------------*/
+
+// Definir roles y permisos
+const roles = {
+  admin: {
+    canEdit: true,
+    canDelete: true,
+    canViewStats: true,
+  },
+  editor: {
+    canEdit: true,
+    canDelete: false,
+    canViewStats: true,
+  },
+  viewer: {
+    canEdit: false,
+    canDelete: false,
+    canViewStats: true,
+  },
+};
+
+// Variable global para el rol actual del usuario
+let currentUserRole = 'viewer'; // Cambiar según el rol del usuario
+
+// Función para verificar permisos
+function hasPermission(action) {
+  return roles[currentUserRole] && roles[currentUserRole][action];
+}
+
+// Ejemplo: Restringir acciones según el rol
+document.getElementById('editBtn').addEventListener('click', function () {
+  if (!hasPermission('canEdit')) {
+    alert('No tienes permiso para editar.');
+    return;
+  }
+  // ...acción de edición...
+});
+
+document.getElementById('deleteBtn').addEventListener('click', function () {
+  if (!hasPermission('canDelete')) {
+    alert('No tienes permiso para eliminar.');
+    return;
+  }
+  // ...acción de eliminación...
+});
+
+document.getElementById('viewStatsBtn').addEventListener('click', function () {
+  if (!hasPermission('canViewStats')) {
+    alert('No tienes permiso para ver estadísticas.');
+    return;
+  }
+  // ...acción para ver estadísticas...
+});
 
 
+
+/*-------------       LOGIN Y LOGOUT DE USUARIO      ---------------*/
+
+// Vincular el botón de registro al popup
+document.getElementById('registerBtn').addEventListener('click', openRegisterPopup);
+
+/*-------------       9.AGREGAR NUEVOS DATOS      ---------------*/
 
 /*      _______________
         ||   CAPAS   ||
@@ -611,12 +477,49 @@ const map = new Map({
     });
 
     
-  // Agregar LayerSwitcher
+// Configurar LayerSwitcher en el contenedor de la cabecera
 const layerSwitcher = new LayerSwitcher({
-    tipLabel: "Capas", // Tooltip al pasar el mouse
-    groupSelectStyle: "group", // Muestra solo una capa base a la vez
-  });
+  tipLabel: "Capas", // Tooltip al pasar el mouse
+  groupSelectStyle: "group", // Muestra solo una capa base a la vez
+  target: document.getElementById('layerSwitcherContainer'), // Contenedor en la cabecera
+});
 
 map.addControl(layerSwitcher);
 
 sync(map);
+
+// Vincular el botón de la sidebar-right con la funcionalidad
+document.getElementById('toggleSidebarBtn').addEventListener('click', toggleSidebarResults);
+
+// Mostrar la sidebar-right automáticamente al buscar
+document.getElementById('searchBtn').addEventListener('click', function () {
+  const sidebar = document.getElementById('sidebarResults');
+  const button = document.getElementById('toggleSidebarResultsBtn');
+  if (!sidebar.classList.contains('open')) {
+    sidebar.classList.add('open');
+    button.textContent = 'Ocultar Resultados';
+  }
+});
+
+// Función para abrir/cerrar el minimapa
+let isMinimapOpen = true;
+document.getElementById('toggleMinimapBtn').addEventListener('click', function () {
+  isMinimapOpen = !isMinimapOpen;
+  OverviewMapControl.setCollapsed(!isMinimapOpen);
+  this.textContent = isMinimapOpen ? 'Cerrar Minimapa' : 'Abrir Minimapa';
+});
+
+
+// Función para cerrar el popup de información
+document.addEventListener('DOMContentLoaded', function () {
+  const closePopupButton = document.getElementById('closePopup');
+  const popupContainer = document.getElementById('popupContainer');
+
+  if (closePopupButton && popupContainer) {
+    closePopupButton.addEventListener('click', function () {
+      popupContainer.style.display = 'none';
+    });
+  } else {
+    console.error('El botón o el contenedor del popup no se encontraron.');
+  }
+});
