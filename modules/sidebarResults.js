@@ -1,7 +1,6 @@
 export function displaySearchResults(results) {
     const popupContainer = document.getElementById('popupContainer');
     const popupContent = document.getElementById('popupResultsContent');
-  
     popupContent.innerHTML = ''; // Limpiar contenido previo
   
     if (results.length === 0) {
@@ -67,6 +66,8 @@ export function displaySearchResults(results) {
     popupInfo.style.display = 'block';
   
     generateStatistics(results); // Generar estadísticas
+
+    
   }
   
   export function closePopup(popupId) {
@@ -187,4 +188,46 @@ export function displaySearchResults(results) {
         }
       }
     });
+  }
+
+  export function updateSidebarWithSelectedPoints(points) {
+    const sidebar = document.getElementById('sidebarResults');
+    const resultsContainer = document.getElementById('popupResultsContent'); // Contenedor de resultados
+  
+    if (!resultsContainer) {
+      console.error('El contenedor de resultados (popupResultsContent) no se encontró en el DOM.');
+      return;
+    }
+  
+    // Limpiar los resultados anteriores
+    resultsContainer.innerHTML = '';
+  
+    if (points.length === 0) {
+      resultsContainer.innerHTML = '<p>No hay puntos dentro del área seleccionada.</p>';
+      return;
+    }
+  
+    // Crear una lista de los puntos seleccionados
+    const list = document.createElement('ul');
+    points.forEach(point => {
+      const name = point.Nombre || point.get?.('name') || 'Sin nombre';
+      const description = point.descripcion || point.get?.('descripcion') || 'Sin descripción';
+      const link = point.link || point.get?.('link') || '#';
+  
+      const listItem = document.createElement('li');
+      listItem.innerHTML = `
+        <h4>${name}</h4>
+        <p>${description}</p>
+        <a href="${link}" target="_blank">Más información</a>
+      `;
+      list.appendChild(listItem);
+    });
+  
+    resultsContainer.appendChild(list);
+  
+    // Mostrar la barra lateral si está oculta
+    if (!sidebar.classList.contains('open')) {
+      sidebar.classList.add('open');
+      document.getElementById('toggleSidebarResultsBtn').textContent = 'Ocultar Resultados';
+    }
   }

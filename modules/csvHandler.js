@@ -5,6 +5,8 @@ import { Point } from 'ol/geom';
 import { Style, Icon } from 'ol/style';
 import { Overlay } from 'ol';
 import { fromLonLat } from 'ol/proj';
+import { Vector as VectorLayer } from 'ol/layer';
+
 
 export async function loadCSVData() {
   try {
@@ -101,37 +103,51 @@ export function setupCSVHandlers(map, displaySearchResults) {
   });
 }
 
-function addFilteredPointsToMap(map, filteredResults) {
-  const vectorSource = new VectorSource();
 
+/**
+ * Agrega puntos filtrados al mapa y actualiza la lista de puntos representados.
+ * @param {Array} filteredResults - Lista de resultados filtrados.
+ * @param {Object} map - Instancia del mapa de OpenLayers.
+ * @param {Array} representedPoints - Referencia a la lista global de puntos representados.
+ */
+export function addFilteredPointsToMap(filteredResults, map, representedPoints) {
+  const vectorSource = new VectorSource();
+  representedPoints.length = 0; // Reiniciar la lista de puntos representados
+
+  // Crear el Overlay que actuará como el popup
   const popupContainer = document.getElementById('popupContainer');
   const popupContent = document.getElementById('popupInfoContent');
   const overlay = new Overlay({
     element: popupContainer,
     autoPan: true,
-    autoPanAnimation: { duration: 250 },
+    autoPanAnimation: {
+      duration: 250,
+    },
   });
 
-  map.addOverlay(overlay);
-
-  document.getElementById('closePopupButton')?.addEventListener('click', () => {
+  // Función para cerrar el popup
+  function closePopup() {
     popupContainer.style.display = 'none';
     overlay.setPosition(undefined);
-  });
+  }
 
+  const closePopupButton = document.getElementById('closePopupButton');
+  if (closePopupButton) {
+    closePopupButton.addEventListener('click', closePopup);
+  }
+  map.addOverlay(overlay);
+
+  // Iterar sobre los resultados filtrados para agregar puntos al mapa
   filteredResults.forEach(item => {
     const lat = parseFloat(item.Latitud);
     const lon = parseFloat(item.Longitud);
 
     if (!isNaN(lat) && !isNaN(lon)) {
-      console.log('Punto válido:', { lat, lon, name: item.Nombre, usuario: item.usuario }); // Depuración
-
-      const point = new Feature({
-        geometry: new Point(fromLonLat([lon, lat])),
+      const point = new ol.Feature({
+        geometry: new ol.geom.Point(fromLonLat([lon, lat])),
         name: item.Nombre,
         descripcion: item.descripcion,
         link: item.link,
-        usuario: item.usuario, // Agregar el usuario al punto
       });
 
       point.setStyle(new Style({
@@ -143,30 +159,33 @@ function addFilteredPointsToMap(map, filteredResults) {
       }));
 
       vectorSource.addFeature(point);
-    } else {
-      console.warn('Coordenadas inválidas:', { lat, lon, item });
+      representedPoints.push(point); // Agregar el punto a la lista global
     }
   });
 
-  const vectorLayer = new ol.layer.Vector({ source: vectorSource });
+  const vectorLayer = new VectorLayer({
+    source: vectorSource,
+  });
+
+  // Agregar la capa al mapa
   map.addLayer(vectorLayer);
 
+  // Evento de selección de puntos
   const selectInteraction = new ol.interaction.Select({
     condition: ol.events.condition.click,
   });
 
   selectInteraction.on('select', function (event) {
     const selectedFeature = event.selected[0];
+
     if (selectedFeature) {
       const name = selectedFeature.get('name');
       const description = selectedFeature.get('descripcion');
       const link = selectedFeature.get('link');
-      const usuario = selectedFeature.get('usuario'); // Obtener el usuario
 
       popupContent.innerHTML = `
         <h3>${name}</h3>
         <p>${description}</p>
-        <p><strong>Subido por:</strong> ${usuario}</p>
         <a href="${link}" target="_blank">Más información</a>
       `;
       popupContainer.style.display = 'flex';

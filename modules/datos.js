@@ -74,7 +74,12 @@ export async function addNewData(event) {
     } catch (error) {
         console.error('Error al enviar datos:', error);
         alert('Error al guardar los datos.');
+        return; // Asegúrate de que el flujo no continúe si hay un error
     }
+
+    // Recargar la página para reflejar los cambios
+    console.log('Recargando la página...');
+    location.reload();
 
     // Depuración: Verificar los datos enviados
     console.log('Datos enviados al servidor:', data);
@@ -101,41 +106,9 @@ export async function addNewData(event) {
     // Agregar el nuevo dato a la lista de datos existentes
     csvData.push(data);
 
-
-//--------------------------------------------------------------
-//--------------------------------------------------------------
-/*ERROR:  no se actualiza tras añadir el nuevo dato y se debe actualizar a mano
-*/
     //verificar datos antes de enviar
     console.log('Valores antes de enviar:', data); // Depuración adicional
-/*
-    try {
-        const response = await fetch('http://localhost:3000/addData', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        });
 
-        const responseText = await response.text();
-        console.log('Estado de la respuesta:', response.status, response.statusText);
-        console.log('Respuesta del servidor:', responseText);
-
-        if (!response.ok) {
-            throw new Error(responseText);
-        }
-
-        alert('Datos guardados correctamente.');
-        document.getElementById('addDataForm').reset();
-        document.getElementById('addDataForm').style.display = 'none';
-    } catch (error) {
-        console.error('Error al guardar los datos:', error);
-        alert(`Error al guardar los datos: ${error.message}`);
-    } finally {
-        addNewData.isSubmitting = false; // Restablecer el estado después de completar la solicitud
-    }
-*/
 // Inicializar la propiedad isSubmitting para evitar solicitudes duplicadas
 addNewData.isSubmitting = false;
 } // Close the addNewData function
