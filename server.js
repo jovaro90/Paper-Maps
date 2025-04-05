@@ -4,6 +4,7 @@ npm install express body-parser
 
 node server.js
 npm install cors
+npm start
 */
 
 /* puerto 3000 en uso:
@@ -73,7 +74,7 @@ app.post('/register', (req, res) => {
 
 // Ruta para guardar datos en buscador.csv
 app.post('/addData', (req, res) => {
-  const { nombre, tematica, latitud, longitud, link, ubicacion, anio, palabraClave, descripcion } = req.body;
+  const { nombre, tematica, latitud, longitud, link, ubicacion, anio, palabraClave, descripcion, usuario } = req.body;
 
   if (!nombre || !tematica || !latitud || !longitud || !link) {
     return res.status(400).send('Todos los campos obligatorios deben ser completados.');
@@ -99,7 +100,7 @@ fs.readFile(filePath, 'utf8', (err, data) => {
   }
 
   // Formatear los datos antes de guardarlos
-  const newData = `${nombre};${ubicacion || ''};${tematica};${anio || ''};${palabraClave || ''};${latitud};${longitud};${link};${descripcion || ''}\n`;
+  const newData = `${nombre};${ubicacion || ''};${tematica};${anio || ''};${palabraClave || ''};${latitud};${longitud};${link};${descripcion || ''};${usuario}\n`;
 
   // Agregar los nuevos datos al archivo CSV
   fs.appendFile(filePath, newData, (err) => {

@@ -32,7 +32,7 @@
       <div class="header-content">
         <h1>Paper Maps</h1>
         <div class="header-buttons">
-          <div id="layerSwitcherContainer" class="header-btn"></div> <!-- Mover aquí -->
+          
           <button id="toggleSidebarBtn" class="header-btn">Mostrar Resultados</button>
           <button id="selectAreaBtn" class="header-btn">Seleccionar Área</button>
           <button id="toggleMinimapBtn" class="header-btn">Abrir Minimapa</button>
@@ -91,11 +91,6 @@
             <button id="cancelAddDataBtn" type="button" onclick="hideAddDataForm()">Cancelar</button>
           </div>
         </form>
-            
-            <!-- Campos adicionales -->
-            
-            
-           
           </div>
         </div>
 
@@ -115,27 +110,33 @@
 </div>
     </header>
 
-    
     <!-- Contenedor de la mapa -->
     <div class="container"></div>
-    <div id="map" class="map"></div>
-
-    <!-- Sidebar de salida de resultados de los estudios -->
-    <div id="sidebarResults" class="sidebar-right">
-      <div style="display: flex; flex-direction: column; height: 100%;">
-        <!-- Contenedor de resultados -->
-        <div id="popupResultsContent" style="flex: 1; overflow-y: auto; padding: 10px; border-bottom: 1px solid #ccc;">
-          <h2>Resultados de Búsqueda</h2>
-        </div>
-        <!-- Contenedor de estadísticas -->
-        <div id="popupStatsContent" style="flex: 1; overflow-y: auto; padding: 10px;">
-          <h2>Estadísticas</h2>
-        </div>
-      </div>
+    <div id="map" class="map">      
     </div>
 
-    <!-- Botón para mostrar/ocultar el sidebar -->
-    <button id="toggleSidebarResultsBtn" onclick="toggleSidebarResults()">Ocultar Resultados</button>
+    <!-- Botón para alternar la visibilidad del sidebar -->
+<button id="toggleSidebarResultsBtn">Mostrar Resultados</button>
+<button id="toggleResultsBtn">Mostrar Resultados</button>
+
+<!-- Sidebar de resultados -->
+<div id="sidebarResults" class="sidebar-right">
+  <div style="display: flex; flex-direction: column; height: 100%;">
+    <!-- Contenedor de resultados -->
+    <div id="popupResultsContent" style="flex: 1; overflow-y: auto; padding: 10px; border-bottom: 1px solid #ccc;">
+      <h2>Resultados de Búsqueda</h2>
+    </div>
+    <!-- Contenedor de estadísticas -->
+    <div id="popupStatsContent" style="flex: 1; overflow-y: auto; padding: 10px;">
+      <h2>Estadísticas</h2>
+    </div>
+  </div>
+</div>
+
+<!-- Contenedor del minimapa -->
+<div class="ol-overviewmap"></div>
+   
+    
 
     <script>
       function toggleSidebarResults() {
@@ -149,6 +150,8 @@
           button.textContent = 'Mostrar Resultados';
         }
       }
+
+      document.getElementById('toggleSidebarResultsBtn').addEventListener('click', toggleSidebarResults);
     </script>
 
  <!-- Popup info punto -->
@@ -201,7 +204,13 @@
       </div>
     </div>
 
-
+    <div class="header">
+      <div class="header-buttons">
+        <button id="zoomInBtn">+</button>
+        <button id="zoomOutBtn">-</button>
+        <div id="layerSwitcherContainer"></div> <!-- Contenedor para el LayerSwitcher -->
+      </div>
+    </div>
 
 <!----------- ROL USUARIOS ------------------>
 
@@ -287,5 +296,7 @@
         sidebar.classList.remove('active');
       }
     </script>
+    
+    <script type="module" src="main.js"></script>
   </body>
 </html>

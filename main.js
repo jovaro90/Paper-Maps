@@ -1,3 +1,4 @@
+//holi
 //-----------------------------------------------------------//
 /*-------------------- LIBRERIAS -------------------------- */
 //---------------------------------------------------------//
@@ -18,6 +19,10 @@ import { ScaleLine } from 'ol/Control';
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
+
+
+
+
 
 
 //-----------------------------------------------------------//
@@ -70,7 +75,7 @@ const extendControls = [
 
 const osmLayer = new TileLayer ({
   title: "OSM",
-  visible: true,
+  visible: false,
   source: new OSM(),
   type: "base",
 });
@@ -85,11 +90,101 @@ const ortoPNOALayer = new TileLayer ({
   }),
 type: "base",
 });
+const cartoDarkLayer = new TileLayer({
+  title: "CARTO Dark",
+  visible: true,
+  source: new OSM({
+    url: "http://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
+  }),
+  type: "base",
+});
 
-// Añadir las capas a un grupo de capas base
+const googleMapsLayer = new TileLayer({
+  title: "Google Maps",
+  visible: false,
+  source: new OSM({
+    url: "https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}",
+  }),
+  type: "base",
+});
+
+const googleSatelliteLayer = new TileLayer({
+  title: "Google Satellite",
+  visible: false,
+  source: new OSM({
+    url: "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}",
+  }),
+  type: "base",
+});
+
+const googleTrafficLayer = new TileLayer({
+  title: "Google Traffic",
+  visible: false,
+  source: new OSM({
+    url: "https://mt1.google.com/vt/lyrs=h@159000000,traffic|seconds_into_week:-1&style=3&x={x}&y={y}&z={z}",
+  }),
+  type: "base",
+});
+
+const googleRoadsLayer = new TileLayer({
+  title: "Google Roads",
+  visible: false,
+  source: new OSM({
+    url: "https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}",
+  }),
+  type: "base",
+});
+
+const esriImageryLayer = new TileLayer({
+  title: "ESRI Imagery",
+  visible: false,
+  source: new OSM({
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+  }),
+  type: "base",
+});
+
+const esriStreetsLayer = new TileLayer({
+  title: "ESRI Streets",
+  visible: false,
+  source: new OSM({
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+  }),
+  type: "base",
+});
+
+const esriTopoLayer = new TileLayer({
+  title: "ESRI Topo",
+  visible: false,
+  source: new OSM({
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+  }),
+  type: "base",
+});
+
+const esriTransportationLayer = new TileLayer({
+  title: "ESRI Transportation",
+  visible: false,
+  source: new OSM({
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+  }),
+  type: "base",
+});
+
+  // Añadir las capas a un grupo de capas base
 const baseLayers = new LayerGroup({
   title: "Capas Base",
-  layers: [osmLayer, ortoPNOALayer],
+  layers: [osmLayer,
+    ortoPNOALayer,
+    cartoDarkLayer,
+    googleMapsLayer,
+    googleSatelliteLayer,
+    googleTrafficLayer,
+    googleRoadsLayer,
+    esriImageryLayer,
+    esriStreetsLayer,
+    esriTopoLayer,
+    esriTransportationLayer,],
 });
 
 const map = new Map({
@@ -108,22 +203,45 @@ const map = new Map({
     }).extend(extendControls),
   });
 
-  
-// Configurar LayerSwitcher en el contenedor de la cabecera
+// Crear el contenedor del botón LayerSwitcher
+const layerSwitcherButton = document.createElement('div');
+layerSwitcherButton.className = 'layer-switcher-button';
+layerSwitcherButton.innerHTML = 'Capas'; // Texto del botón
+layerSwitcherButton.onclick = () => {
+  const layerSwitcherContainer = document.getElementById('layerSwitcherContainer');
+  if (layerSwitcherContainer) {
+    layerSwitcherContainer.style.display =
+      layerSwitcherContainer.style.display === 'none' ? 'block' : 'none';
+  }
+};
+
+// Agregar el botón al contenedor de controles del mapa
+document.body.appendChild(layerSwitcherButton);
+
+// Crear el contenedor del LayerSwitcher
+const layerSwitcherContainer = document.createElement('div');
+layerSwitcherContainer.id = 'layerSwitcherContainer';
+layerSwitcherContainer.style.display = 'none'; // Ocultar inicialmente
+document.body.appendChild(layerSwitcherContainer);
+
+// Crear el LayerSwitcher
 const layerSwitcher = new LayerSwitcher({
-tipLabel: "Capas", // Tooltip al pasar el mouse
-groupSelectStyle: "group", // Muestra solo una capa base a la vez
-target: document.getElementById('layerSwitcherContainer'), // Contenedor en la cabecera
+  tipLabel: "Capas", // Tooltip al pasar el mouse
+  groupSelectStyle: "group", // Muestra solo una capa base a la vez
+  target: layerSwitcherContainer, // Contenedor específico
 });
 
+// Agregar el LayerSwitcher al mapa
 map.addControl(layerSwitcher);
 
 sync(map);
 
+// Llamar setupCSVHandlers después de que el mapa esté definido
+setupCSVHandlers(map, displaySearchResults);
+
 //-------------------------------------------------------------------------
 // ------------------------------ MODULOS ---------------------------------
 //-------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------//
 /*----------- CARGAR CSV Y FILTRAR NUEVOS DATOS------------ */
@@ -132,6 +250,7 @@ sync(map);
 
 // importar CSV datos
 import { loadCSVData, filterCSVData, processCSVData } from './modules/csvHandler.js';
+import { setupCSVHandlers } from './modules/csvHandler.js';
 
 // Cargar y filtrar datos CSV
 let csvData = [];
@@ -153,12 +272,17 @@ document.getElementById('searchBtn').addEventListener('click', function () {
   const year = document.getElementById('yearFilter').value;
   const keyword = document.getElementById('searchBox').value.toLowerCase();
 
+ 
+
   // Filtrar los datos según los criterios del usuario
   filteredResults = filterCSVData(csvData, location, theme, year, keyword);
 
   // Mostrar los resultados filtrados
   document.getElementById('resultCount').textContent = `Resultados encontrados: ${filteredResults.length}`;
   displaySearchResults(filteredResults);
+
+  // Limpiar y agregar puntos al mapa
+  addFilteredPointsToMap(map, filteredResults);
 });
 
 
@@ -188,9 +312,8 @@ document.getElementById('searchBtn').addEventListener('click', function () {
   displaySearchResults(filteredResults);
 
   // Agregar los puntos filtrados al mapa
-  addFilteredPointsToMap(filteredResults, map, representedPoints);
+  addFilteredPointsToMap(map, filteredResults, representedPoints);
 });
-
 
 
 
@@ -228,7 +351,6 @@ import {
   submitRegistration,
   setUserRole,
   initializeRoleAndSidebarEvents, 
-  getUsername,
   
 } from './modules/login.js';
 
@@ -258,16 +380,9 @@ window.onload = function () {
   if (cancelRegisterBtn) {
     cancelRegisterBtn.addEventListener('click', closeRegisterPopup);
   }
-  const username = getUsername();
 };
 // Vincular el botón de registro al popup
 document.getElementById('registerBtn').addEventListener('click', openRegisterPopup);
-
-document.getElementById('someButton').addEventListener('click', function () {
-  const username = getUsername();
-  console.log('Nombre de usuario:', username);
-  // Realiza alguna acción con el nombre de usuario
-});
 
 
 //-----------------------------------------------------------//
@@ -292,20 +407,62 @@ document.getElementById('selectAreaBtn').addEventListener('click', function () {
 
 
 //sidebar derecha resultados
-import { displaySearchResults, closePopup, generateStatistics, } from './modules/sidebarResults.js';
+import { displaySearchResults, closePopup, generateStatistics, updateSidebarWithSelectedPoints, toggleSidebarResults,updateSidebarButtonState, setupToggleButton } from './modules/sidebarResults.js';
 
-// Vincular el botón de la sidebar-right con la funcionalidad
+document.addEventListener("DOMContentLoaded", () => {
+  setupToggleButton();
+});
+let allData = []; // Variable global para almacenar los datos completos
+
+// Cargar los datos CSV al inicio
+loadCSVData().then(data => {
+  allData = data; // Guardar los datos completos
+  console.log('Datos cargados desde buscador.csv:', allData); // Depuración para verificar los datos
+
+  // Generar estadísticas iniciales basadas en los datos completos
+  generateStatistics(allData);
+});
+
+document.getElementById('toggleResultsBtn').addEventListener('click', toggleResults);
+
+// Vincular el botón de la barra lateral con la funcionalidad
 document.getElementById('toggleSidebarBtn').addEventListener('click', toggleSidebarResults);
+
+document.getElementById('toggleSidebarResultsBtn').addEventListener('click', function () {
+  const sidebar = document.getElementById('sidebarResults');
+  const minimap = document.querySelector('.ol-overviewmap');
+
+  if (!sidebar || !minimap) {
+    console.error('No se encontraron los elementos necesarios.');
+    return;
+  }
+
+  // Alternar la clase "open" en la barra lateral
+  sidebar.classList.toggle('open');
+
+  // Actualizar el estado del botón usando la función
+  //updateSidebarButtonState(sidebar.classList.contains('open'));
+
+  // Ajustar la posición del minimapa
+  if (sidebar.classList.contains('open')) {
+    minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
+  } else {
+    minimap.style.right = '10px'; // Restaurar la posición original
+  }
+});
 
 // Mostrar la sidebar-right automáticamente al buscar
 document.getElementById('searchBtn').addEventListener('click', function () {
   const sidebar = document.getElementById('sidebarResults');
-  const button = document.getElementById('toggleSidebarResultsBtn');
   if (!sidebar.classList.contains('open')) {
     sidebar.classList.add('open');
-    button.textContent = 'Ocultar Resultados';
+    updateSidebarButtonState(true); // Actualizar el estado del botón
   }
 });
+
+
+//------------------------------------------------------------//
+
 
 // Función para abrir/cerrar el minimapa
 let isMinimapOpen = true;
@@ -329,7 +486,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.error('El botón o el contenedor del popup no se encontraron.');
   }
 });
-
 
 
 //-----------------------------------------------------------//

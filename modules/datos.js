@@ -1,5 +1,3 @@
-import { getUsername } from "./login";
-
 export async function addNewData(event) {
     // Verificar si el evento existe y prevenir el comportamiento predeterminado
     if (event && typeof event.preventDefault === 'function') {
@@ -52,7 +50,7 @@ export async function addNewData(event) {
         anio: anio || '',  // Opcional
         palabraclave: palabraClave || '', // Opcional
         descripcion: descripcion || '', // Opcional
-        usuario: getUsername(), // Agregar el usuario que subió los datos
+        usuario, // Agregar el usuario que subió los datos
     };
 
     try {
@@ -108,6 +106,11 @@ export async function addNewData(event) {
     // Agregar el nuevo dato a la lista de datos existentes
     csvData.push(data);
 
+
+//--------------------------------------------------------------
+//--------------------------------------------------------------
+/*ERROR:  no se actualiza tras añadir el nuevo dato y se debe actualizar a mano
+*/
     //verificar datos antes de enviar
     console.log('Valores antes de enviar:', data); // Depuración adicional
 

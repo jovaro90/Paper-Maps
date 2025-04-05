@@ -75,18 +75,6 @@ html, body {
   background: #d3d0d0;
 }
 
-@media (max-width: 600px) {
-  .header-content h1 {
-      font-size: 1.5rem;
-  }
-  .header-content p {
-      font-size: 1rem;
-  }
-  #selectAreaBtn {
-      font-size: 0.9rem;
-      padding: 8px 16px;
-  }
-}
 
 /* Estilos para los botones en la cabecera */
 .header-buttons {
@@ -114,33 +102,68 @@ html, body {
   color:#000000;
   background: #d3d0d0; /* Color más oscuro al pasar el mouse */
 }
-
-/* Estilo para el contenedor del LayerSwitcher en la cabecera */
 #layerSwitcherContainer {
   display: inline-block;
-  padding: 0;
-  margin: 0;
-  background: none;
-  border: none;
-  cursor: pointer;
+  margin-left: 10px; /* Espaciado entre los botones de zoom y el LayerSwitcher */
 }
 
-.layerSwitcher-btn {
-  background: #000000;
-  color: #ffffff;
-  border: 2px solid #ffffff;
-  padding: 5px 10px;
-  font-size: 0.9rem;
-  font-weight: bold;
+/* Estilo para los controles de zoom */
+.ol-zoom {
+  position: absolute;
+  top: 140px; /* Alineado con el LayerSwitcher */
+  left: calc(50% + 180px); /* Posicionado al lado derecho del LayerSwitcher */
+  transform: translateX(-50%);
+  z-index: 1000; /* Asegurar que esté por encima del mapa */
+}
+
+.ol-zoom button {
+  background-color: black; /* Fondo negro */
+  color: white; /* Texto blanco */
   border-radius: 5px;
+  padding: 5px;
+  font-size: 16px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
+  margin: 2px; /* Espaciado entre botones */
 }
 
-.layerSwitcher-btn:hover {
-  background: #d3d0d0;
-  color: #000000;
+.ol-zoom button:hover {
+  background-color: #333; /* Fondo más claro al pasar el mouse */
 }
+
+/* Estilo para el botón LayerSwitcher */
+.layer-switcher-button {
+  position: absolute;
+  top: 180px; /* Ajusta según la posición de los botones de zoom */
+  left: calc(50% + 180px); /* Alineado con los botones de zoom */
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 1000;
+  text-align: center;
+}
+
+.layer-switcher-button:hover {
+  background-color: #333;
+}
+
+/* Contenedor del LayerSwitcher */
+#layerSwitcherContainer {
+  position: absolute;
+  top: 220px; /* Debajo del botón */
+  left: calc(50% + 180px);
+  transform: translateX(-50%);
+  z-index: 1000;
+  background-color: black;
+  color: white;
+  border-radius: 5px;
+  padding: 10px;
+  display: none; /* Ocultar inicialmente */
+}
+
 /* -------------- SIDEBAR INFO ---------------------------- */
 /* Sidebar-right inicialmente oculta */
 .sidebar-right {
@@ -169,69 +192,84 @@ html, body {
   }
 }
 
-/* Botón para abrir/cerrar la sidebar */
-.toggle-sidebar-right-btn {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 1000; 
-  background-color: #fc3434;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
+
+
+/*---------------------------------------------------------------*/
+/* -------------- POPUP RESULTADOS ---------------------------- */
+/*-------------------------------------------------------------*/
+
+#popupResults {
+  position: absolute;
+  top: 10%;
+  
+  transform: translateX(-50%);
+  overflow-y: auto;
+}
+
+/* Estilo para el contenedor de resultados con slider lateral */
+#popupResultsContent {
+  max-height: 80vh; /* Limitar la altura máxima */
+  overflow-y: auto; /* Habilitar el slider lateral */
+  padding: 10px; /* Espaciado interno */
+  background-color: #f9f9f9; /* Fondo claro */
+  border: 1px solid #ccc; /* Borde */
+  border-radius: 5px; /* Bordes redondeados */
+}
+
+#popupStats {
+  position: absolute;
+  top: 1%;
+  left: 30%;
+  transform: translateX(-50%);
+  height: auto;
+  width: 100%;
+  max-width: 500px;
+  max-height: 600px;
+  overflow: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para dividir la sidebar en dos mitades */
+#popupResultsContent, #popupStatsContent {
+  background-color: #000000;
+  color: #ffffff;
   border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 10px;
 }
 
-.toggle-sidebar-right-btn:hover {
-  background-color: #45a049;
+#popupResultsContent {
+  border-bottom: 1px solid #ccc; /* Separador entre resultados y estadísticas */
 }
 
+/* Ajustar el tamaño de los gráficos */
+#pieChart, #barChart {
+  max-height: 200px;
+  width: 100%;
+}
 
-
-/* -------------- GRAFICOS ---------------------------- */
-/* Estilo para el canvas de las estadísticas *//*
+/* -------------- POPUP QUESITO ---------------------------- */
 #statsChart {
   width: 100%;
-  height: 250px; /* Limita la altura del gráfico *//*
+  height: 50px;
   max-height: 300px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
 }
 
-/* Estilo adicional para el contenido dentro de las sidebars *//*
-.sidebar-right h2 {
-  margin-top: 50px;
-  font-size: 18px;
-}
 
-/* Estilo para los botones de abrir las sidebars *//*
-#openResultsBtn, #openStatsBtn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  padding: 10px 20px;
-  background-color: #000000;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
+/*---------------------------------------------------------------*/
+/* ----------------------- ESCALA ----------------------------- */
+/*-------------------------------------------------------------*/
 
-#openResultsBtn:hover, #openStatsBtn:hover {
-  background-color: #45a049;
-}
-*/
-/* -------------- ESCALA ---------------------------- */
+
 /* Estilos de la barra de escala */
 .ol-scale-bar {
-  background-color: rgba(165, 165, 30, 0); /* Fondo oscuro */
+  background-color: rgba(0, 0, 0, 0.911); /* Fondo oscuro */
   border-radius: 7px; /* Bordes redondeados */
-  padding: 20px 9px; /* Espaciado interno */
-  color: rgb(0, 0, 0); /* Texto blanco */
+  padding: 15px 9px; /* Espaciado interno */
+  color: rgb(255, 255, 255); /* Texto blanco */
   box-shadow: 0 20px 8px rgba(0, 0, 0, 0); /* Sombra para dar profundidad */
 }
 
@@ -243,7 +281,7 @@ html, body {
 
 /* texto de la escala */
 .ol-scale-text {
-  color: #000000;
+  color: #ffffff;
   position:absolute;
   top: 0px;
   font-size: 16px; /* Tamaño de la fuente */
@@ -251,22 +289,33 @@ html, body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
 }
 
-/* -------------- MINIMAPA ---------------------------- */
+
+/*---------------------------------------------------------------*/
+/* ---------------------- MINIMAPA ---------------------------- */
+/*-------------------------------------------------------------*/
+
 /* Barra minimapa */
 .ol-overviewmap {
   position: absolute;
   top: 82.5%;
   left: 92%;
   transform: translate(-50%);
-  width: 20px;
+  width: 150px;
   height: 150px;
   background: rgba(0, 0, 0, 0); /* Fondo con transparencia */
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(226, 27, 27, 0);
-  transition: right 0.3s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: right 0.3s ease-in-out, top 0.3s ease-in-out; /* Transición suave */
 }
+/* Ajuste del minimapa cuando la sidebar está abierta */
+.sidebar-right.open ~ .ol-overviewmap {
+  right: 820px; /* Mueve el minimapa hacia la izquierda para evitar la sidebar */
+}
+/*---------------------------------------------------------------*/
+/* -------------- SIDEBAR IZQUIERDA BUSQUEDA ------------------ */
+/*-------------------------------------------------------------*/
 
-/* -------------- SIDEBAR IZQUIERDA ---------------------------- */
+
 /* Contenedor lateral para búsqueda */
 .sidebar-container {
   position: absolute;
@@ -330,7 +379,7 @@ html, body {
 }
 
 #searchBtn:hover {
-  background: #2a9ca1;
+  background: #7f7f80;
   color: #e0f7f9;
 }
 
@@ -398,28 +447,11 @@ html, body {
   box-shadow: 0 0 5px rgba(52, 184, 194, 0.5);
 }
 
-/* SIDEBAR DERECHA ---*/
-/* Estilo para el botón de mostrar/ocultar la sidebar derecha */
-/*.toggle-sidebar-btn {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  z-index: 1000; 
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 5px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
+/*---------------------------------------------------------------*/
+/* --------------- POPUP INFO CLIC ---------------------------- */
+/*-------------------------------------------------------------*/
 
-.toggle-sidebar-btn:hover {
-  background-color: #000000;
-}*/
 
-/* -------------- POPUP INFO ---------------------------- */
 /* Estilo para el contenedor del popup */
 #popupContainer {
   position: fixed;
@@ -436,7 +468,8 @@ html, body {
 
 /* Estilo para el propio popup */
 #popupInfo {
-  background-color: white;
+  background-color: #192431;
+  color: #ffffff;
   width: 80%; /* Puedes ajustarlo a tu gusto */
   max-width: 600px; /* Máximo tamaño de ancho */
   min-height: 300px; /* Altura mínima */
@@ -477,13 +510,16 @@ html, body {
 
       .close-btn {
         float: right;
-        font-size: 28px;
+        background-color: black;
+        color: white;
+        font-size: 18px;
         font-weight: bold;
         cursor: pointer;
       }
 
       .close-btn:hover {
-        color: rgb(58, 84, 168);
+        background-color: #d3d0d0 ;
+        color: rgb(0, 0, 0);
       }
 
 
@@ -568,86 +604,13 @@ html, body {
   background-color: #45a049;
 }
 
-/* -------------- TABLETS ---------------------------- */ /*
-@media (max-width: 768px) {
-  #popupContainer {
-    flex-direction: column;
-  }
-
-  .popup {
-    width: 70%;
-  }
-}
-*/
-/* -------------- POPUP RESULTADOS ---------------------------- */
-#popupResults {
-  position: absolute;
-  top: 10%;
-  left: 30%;
-  transform: translateX(-50%);
-  overflow-y: auto;
-}
-
-/* Estilo para el contenedor de resultados con slider lateral */
-#popupResultsContent {
-  max-height: 80vh; /* Limitar la altura máxima */
-  overflow-y: auto; /* Habilitar el slider lateral */
-  padding: 10px; /* Espaciado interno */
-  background-color: #f9f9f9; /* Fondo claro */
-  border: 1px solid #ccc; /* Borde */
-  border-radius: 5px; /* Bordes redondeados */
-}
-
-#popupStats {
-  position: absolute;
-  top: 1%;
-  left: 30%;
-  transform: translateX(-50%);
-  height: auto;
-  width: 100%;
-  max-width: 500px;
-  max-height: 600px;
-  overflow: auto;
-  padding: 20px;
-  box-sizing: border-box;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo para dividir la sidebar en dos mitades */
-#popupResultsContent, #popupStatsContent {
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  padding: 10px;
-}
-
-#popupResultsContent {
-  border-bottom: 1px solid #ccc; /* Separador entre resultados y estadísticas */
-}
-
-/* Ajustar el tamaño de los gráficos */
-#pieChart, #barChart {
-  max-height: 200px;
-  width: 100%;
-}
-
-/* -------------- POPUP QUESITO ---------------------------- */
-#statsChart {
-  width: 100%;
-  height: 50px;
-  max-height: 300px;
-}
-
-/*-------------------------------*/
-
 /* Estilos para los botones de login y logout */
 .auth-buttons {
   margin-top: 10px;
 }
 
 .auth-buttons button {
-  background: #000000;
+  background:rgb(31, 22, 22);
   color: #ffffff;
   border: 2px solid #ffffff;
   padding: 2px 3px;

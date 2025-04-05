@@ -2,6 +2,7 @@ import { updateSidebarWithSelectedPoints } from './sidebarResults.js';
 import { fromLonLat } from 'ol/proj';
 import { Draw } from 'ol/interaction';
 import { Style, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
+import { containsCoordinate } from 'ol/extent';
 
 export function enableAreaSelection(map, representedPoints, filteredResults) {
   const drawInteraction = new Draw({
@@ -14,6 +15,9 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
   drawInteraction.on('drawend', function (event) {
     const areaPolygon = event.feature.getGeometry();
     console.log('Coordenadas del polígono:', areaPolygon.getCoordinates());
+
+    // Verificar puntos representados
+    console.log('Puntos representados:', representedPoints);
 
     // Filtrar los puntos dentro del área seleccionada
     const pointsInArea = representedPoints.filter(point => {

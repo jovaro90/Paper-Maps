@@ -12,6 +12,8 @@
   "author": "jordi valls",
   "license": "ISC",
   "devDependencies": {
+    "@fullhuman/postcss-purgecss": "^7.0.2",
+    "@ljharb/tsconfig": "^0.3.2",
     "ol": "^10.4.0",
     "webpack": "^5.97.1",
     "webpack-cli": "^6.0.1",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "body-parser": "^2.2.0",
+    "chart.js": "^4.4.8",
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "ol-hashed": "^2.1.0",

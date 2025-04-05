@@ -1,7 +1,10 @@
+import Chart from 'chart.js/auto';
+
 export function displaySearchResults(results) {
     const popupContainer = document.getElementById('popupContainer');
     const popupContent = document.getElementById('popupResultsContent');
     popupContent.innerHTML = ''; // Limpiar contenido previo
+
   
     if (results.length === 0) {
       popupContent.innerHTML = '<p>No se encontraron resultados.</p>';
@@ -90,105 +93,105 @@ export function displaySearchResults(results) {
   }
   
   export function generateStatistics(results, selectedYear = null) {
-    const statsContainer = document.getElementById('popupStatsContent');
-    statsContainer.innerHTML = ''; // Limpiar contenido previo
-  
-    // Filtrar resultados por año si se selecciona uno
-    const filteredResults = selectedYear
-      ? results.filter(result => result.anio === selectedYear)
-      : results;
-  
-    // Conteo de temáticas
-    let themesCount = {};
-    results.forEach(result => {
-      if (result.tematica) {
-        themesCount[result.tematica] = (themesCount[result.tematica] || 0) + 1;
-      }
-    });
-  
-    // Calcular etiquetas y valores para el gráfico
-    const themeLabels = Object.keys(themesCount);
-    const themeValues = Object.values(themesCount);
-  
-    // Crear gráficos dentro del contenedor de estadísticas
-    statsContainer.innerHTML = `
-      <h4>Proyectos por Temática ${selectedYear ? `en ${selectedYear}` : '(Total)'}</h4>
-      <canvas id="pieChart" style="max-height: 200px;"></canvas>
-      <h4>Proyectos por Año</h4>
-      <canvas id="barChart" style="max-height: 200px;"></canvas>
-    `;
-  
-    const ctxPie = document.getElementById('pieChart').getContext('2d');
-    const ctxBar = document.getElementById('barChart').getContext('2d');
-  
-    // Si ya existe una instancia del gráfico, destruirlas antes de crear nuevas
-    if (window.pieChart instanceof Chart) {
-      window.pieChart.destroy();
+  const statsContainer = document.getElementById('popupStatsContent');
+  statsContainer.innerHTML = ''; // Limpiar contenido previo
+
+  // Filtrar resultados por año si se selecciona uno
+  const filteredResults = selectedYear
+    ? results.filter(result => result.anio === selectedYear)
+    : results;
+
+  // Conteo de temáticas: usar 'filteredResults' para el gráfico de pastel
+  let themesCount = {};
+  filteredResults.forEach(result => {
+    if (result.tematica) {
+      themesCount[result.tematica] = (themesCount[result.tematica] || 0) + 1;
     }
-    if (window.barChart instanceof Chart) {
-      window.barChart.destroy();
-    }
-  
-    // Gráfico de Pastel (Quesito) para Temáticas
-    window.pieChart = new Chart(ctxPie, {
-      type: 'pie',
-      data: {
-        labels: themeLabels,
-        datasets: [{
-          label: `Proyectos por Temática ${selectedYear ? `en ${selectedYear}` : '(Total)'}`,
-          data: themeValues,
-          backgroundColor: themeLabels.map((_, index) => `hsl(${(index * 360 / themeLabels.length)}, 70%, 50%)`), // Generar colores únicos
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          tooltip: {
-            callbacks: {
-              label: function (tooltipItem) {
-                const total = themeValues.reduce((sum, value) => sum + value, 0);
-                const value = themeValues[tooltipItem.dataIndex];
-                const percentage = ((value / total) * 100).toFixed(2);
-                return `${themeLabels[tooltipItem.dataIndex]}: ${value} (${percentage}%)`;
-              }
+  });
+
+  // Calcular etiquetas y valores para el gráfico
+  const themeLabels = Object.keys(themesCount);
+  const themeValues = Object.values(themesCount);
+
+  // Crear gráficos dentro del contenedor de estadísticas
+  statsContainer.innerHTML = `
+    <h4>Proyectos por Temática ${selectedYear ? `en ${selectedYear}` : '(Total)'}</h4>
+    <canvas id="pieChart" style="max-height: 200px;"></canvas>
+    <h4>Proyectos por Año</h4>
+    <canvas id="barChart" style="max-height: 200px;"></canvas>
+  `;
+
+  const ctxPie = document.getElementById('pieChart').getContext('2d');
+  const ctxBar = document.getElementById('barChart').getContext('2d');
+
+  // Si ya existe una instancia del gráfico, destruirlas antes de crear nuevas
+  if (window.pieChart instanceof Chart) {
+    window.pieChart.destroy();
+  }
+  if (window.barChart instanceof Chart) {
+    window.barChart.destroy();
+  }
+
+  // Gráfico de Pastel (Quesito) para Temáticas
+  window.pieChart = new Chart(ctxPie, {
+    type: 'pie',
+    data: {
+      labels: themeLabels,
+      datasets: [{
+        label: `Proyectos por Temática ${selectedYear ? `en ${selectedYear}` : '(Total)'}`,
+        data: themeValues,
+        backgroundColor: themeLabels.map((_, index) => `hsl(${(index * 360 / themeLabels.length)}, 70%, 50%)`), // Generar colores únicos
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function (tooltipItem) {
+              const total = themeValues.reduce((sum, value) => sum + value, 0);
+              const value = themeValues[tooltipItem.dataIndex];
+              const percentage = ((value / total) * 100).toFixed(2);
+              return `${themeLabels[tooltipItem.dataIndex]}: ${value} (${percentage}%)`;
             }
           }
         }
       }
-    });
-  
-    // Conteo de años
-    let yearsCount = {};
-    filteredResults.forEach(result => {
-      if (result.anio) {
-        yearsCount[result.anio] = (yearsCount[result.anio] || 0) + 1;
+    }
+  });
+
+  // Conteo de años: usar 'filteredResults' para el gráfico de barras
+  let yearsCount = {};
+  filteredResults.forEach(result => {
+    if (result.anio) {
+      yearsCount[result.anio] = (yearsCount[result.anio] || 0) + 1;
+    }
+  });
+
+  const yearLabels = Object.keys(yearsCount);
+  const yearValues = Object.values(yearsCount);
+
+  // Gráfico de Barras para los Años
+  window.barChart = new Chart(ctxBar, {
+    type: 'bar',
+    data: {
+      labels: yearLabels,
+      datasets: [{
+        label: 'Proyectos por Año',
+        data: yearValues,
+        backgroundColor: '#3357FF',
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: { beginAtZero: true }
       }
-    });
-  
-    const yearLabels = Object.keys(yearsCount);
-    const yearValues = Object.values(yearsCount);
-  
-    // Gráfico de Barras para los Años
-    window.barChart = new Chart(ctxBar, {
-      type: 'bar',
-      data: {
-        labels: yearLabels,
-        datasets: [{
-          label: 'Proyectos por Año',
-          data: yearValues,
-          backgroundColor: '#3357FF',
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: { beginAtZero: true }
-        }
-      }
-    });
-  }
+    }
+  });
+}
 
   export function updateSidebarWithSelectedPoints(points) {
     const sidebar = document.getElementById('sidebarResults');
@@ -231,3 +234,64 @@ export function displaySearchResults(results) {
       document.getElementById('toggleSidebarResultsBtn').textContent = 'Ocultar Resultados';
     }
   }
+
+  export function toggleSidebarResults() {
+    const sidebar = document.getElementById('sidebarResults');
+  const button = document.getElementById('toggleSidebarResultsBtn');
+  const minimap = document.querySelector('.ol-overviewmap');
+
+  if (!sidebar || !button || !minimap) {
+    console.error('No se encontraron los elementos necesarios.');
+    return;
+  }
+
+  // Alternar la clase "open" en la barra lateral
+  sidebar.classList.toggle('open');
+
+  // Cambiar el texto del botón según el estado de la barra lateral
+  button.textContent = sidebar.classList.contains('open') ? 'Ocultar Resultados' : 'Mostrar Resultados';
+
+  // Ajustar la posición del minimapa
+  if (sidebar.classList.contains('open')) {
+    minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
+  } else {
+    minimap.style.right = '10px'; // Restaurar la posición original
+  }
+}
+
+// Asegúrate de que la función esté disponible globalmente para el atributo `onclick`
+if (typeof window !== 'undefined') {
+    window.toggleSidebarResults = toggleSidebarResults;
+}
+
+export function updateSidebarButtonState() {
+    const sidebar = document.getElementById('sidebarResults');
+    const button = document.getElementById('toggleSidebarResultsBtn');
+
+    if (!sidebar || !button) {
+        console.error('No se encontraron los elementos con ID "sidebarResults" o "toggleSidebarResultsBtn".');
+        return;
+    }
+
+    // Actualizar el texto del botón según el estado actual de la barra lateral
+    if (sidebar.classList.contains('open')) {
+        button.textContent = 'Ocultar Resultados';
+    } else {
+        button.textContent = 'Mostrar Resultados';
+    }
+}
+
+export function toggleResults() {
+  const popupResults = document.getElementById("popupResults");
+  if (popupResults) {
+    popupResults.style.display =
+      popupResults.style.display === "none" ? "block" : "none";
+  }
+}
+
+export function setupToggleButton() {
+  const button = document.getElementById("toggleResultsButton");
+  if (button) {
+    button.addEventListener("click", toggleResults);
+  }
+}
