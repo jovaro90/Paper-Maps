@@ -27,6 +27,8 @@
   </head>
 
   <body>
+
+    
     <!-- Cabecera de la página -->
     <header class="full-width-header">
       <div class="header-content">
@@ -136,7 +138,23 @@
 <!-- Contenedor del minimapa -->
 <div class="ol-overviewmap"></div>
    
-    
+<!-- Contenedor para el botón o menú desplegable que permita cambiar entre los mapas base -->
+<div id="baseLayerSwitcher" class="base-layer-select">
+  <label for="baseLayerSelect">Seleccionar Mapa Base:</label>
+  <select id="baseLayerSelect">
+    <option value="OSM">OSM</option>
+    <option value="WMS PNOA">WMS PNOA</option>
+    <option value="CARTO Dark" selected>CARTO Dark</option>
+    <option value="Google Maps">Google Maps</option>
+    <option value="Google Satellite">Google Satellite</option>
+    <option value="Google Traffic">Google Traffic</option>
+    <option value="Google Roads">Google Roads</option>
+    <option value="ESRI Imagery">ESRI Imagery</option>
+    <option value="ESRI Streets">ESRI Streets</option>
+    <option value="ESRI Topo">ESRI Topo</option>
+    <option value="ESRI Transportation">ESRI Transportation</option>
+  </select>
+</div>
 
     <script>
       function toggleSidebarResults() {
@@ -204,13 +222,7 @@
       </div>
     </div>
 
-    <div class="header">
-      <div class="header-buttons">
-        <button id="zoomInBtn">+</button>
-        <button id="zoomOutBtn">-</button>
-        <div id="layerSwitcherContainer"></div> <!-- Contenedor para el LayerSwitcher -->
-      </div>
-    </div>
+
 
 <!----------- ROL USUARIOS ------------------>
 
@@ -278,11 +290,7 @@
       <button onclick="hideAddDataForm()">Cancelar</button>
     </div>
 
-    <!-- Librería Chart.js para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Vinculo con el archivo JS principal -->
-    <script type="module" src="./main.js"></script>
+    
 
     <!-- Scripts para la lógica de apertura/cierre de popups y sidebars -->
     <script>
@@ -298,5 +306,9 @@
     </script>
     
     <script type="module" src="main.js"></script>
+    <!-- Librería Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  
   </body>
 </html>

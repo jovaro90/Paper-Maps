@@ -102,10 +102,6 @@ html, body {
   color:#000000;
   background: #d3d0d0; /* Color más oscuro al pasar el mouse */
 }
-#layerSwitcherContainer {
-  display: inline-block;
-  margin-left: 10px; /* Espaciado entre los botones de zoom y el LayerSwitcher */
-}
 
 /* Estilo para los controles de zoom */
 .ol-zoom {
@@ -128,40 +124,6 @@ html, body {
 
 .ol-zoom button:hover {
   background-color: #333; /* Fondo más claro al pasar el mouse */
-}
-
-/* Estilo para el botón LayerSwitcher */
-.layer-switcher-button {
-  position: absolute;
-  top: 180px; /* Ajusta según la posición de los botones de zoom */
-  left: calc(50% + 180px); /* Alineado con los botones de zoom */
-  transform: translateX(-50%);
-  background-color: black;
-  color: white;
-  border-radius: 5px;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  z-index: 1000;
-  text-align: center;
-}
-
-.layer-switcher-button:hover {
-  background-color: #333;
-}
-
-/* Contenedor del LayerSwitcher */
-#layerSwitcherContainer {
-  position: absolute;
-  top: 220px; /* Debajo del botón */
-  left: calc(50% + 180px);
-  transform: translateX(-50%);
-  z-index: 1000;
-  background-color: black;
-  color: white;
-  border-radius: 5px;
-  padding: 10px;
-  display: none; /* Ocultar inicialmente */
 }
 
 /* -------------- SIDEBAR INFO ---------------------------- */
@@ -895,6 +857,22 @@ html, body {
 
 .admin-sidebar button:hover {
   background-color: #45a049;
+}
+
+/* Estilos para el contenedor del selector de mapas base */
+
+.base-layer-select {
+  position: absolute;
+  top: 140px;
+  left: 340px;
+  z-index: 1000;
+  background-color: rgb(2, 2, 2);
+  color: white;
+  padding: 10px;
+  border-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  font-family: Arial, sans-serif;
 }
 
 

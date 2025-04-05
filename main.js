@@ -12,6 +12,7 @@ import {Tile as TileLayer, Vector as VectorLayer} from 'ol/layer'; //vectorial
 import { fromLonLat } from 'ol/proj';
 import sync from 'ol-hashed'; // añade a la url el centro del mapa
 import {format} from "ol/coordinate";
+import XYZ from 'ol/source/XYZ';
 //librerias Controles
 import { defaults as defaultControls, MousePosition} from "ol/Control";
 import { OverviewMap } from 'ol/Control';
@@ -19,8 +20,6 @@ import { ScaleLine } from 'ol/Control';
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
-
-
 
 
 
@@ -73,7 +72,7 @@ const extendControls = [
 //---------------------------------------------------------//
 
 
-const osmLayer = new TileLayer ({
+const osmLayer = new TileLayer({
   title: "OSM",
   visible: false,
   source: new OSM(),
@@ -81,15 +80,16 @@ const osmLayer = new TileLayer ({
 });
 
 // capa tesela WMS:
-const ortoPNOALayer = new TileLayer ({
+const ortoPNOALayer = new TileLayer({
   title: "WMS PNOA",
   visible: false,
-  source: new TileWMS ({
+  source: new TileWMS({
     url: "https://www.ign.es/wms-inspire/pnoa-ma?",
-    params: {LAYERS: "OI.OrthoimageCoverage", TILED: true},
+    params: { LAYERS: "OI.OrthoimageCoverage", TILED: true },
   }),
-type: "base",
+  type: "base",
 });
+
 const cartoDarkLayer = new TileLayer({
   title: "CARTO Dark",
   visible: true,
@@ -102,7 +102,7 @@ const cartoDarkLayer = new TileLayer({
 const googleMapsLayer = new TileLayer({
   title: "Google Maps",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}",
   }),
   type: "base",
@@ -111,7 +111,7 @@ const googleMapsLayer = new TileLayer({
 const googleSatelliteLayer = new TileLayer({
   title: "Google Satellite",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "http://www.google.cn/maps/vt?lyrs=s@189&gl=cn&x={x}&y={y}&z={z}",
   }),
   type: "base",
@@ -120,7 +120,7 @@ const googleSatelliteLayer = new TileLayer({
 const googleTrafficLayer = new TileLayer({
   title: "Google Traffic",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://mt1.google.com/vt/lyrs=h@159000000,traffic|seconds_into_week:-1&style=3&x={x}&y={y}&z={z}",
   }),
   type: "base",
@@ -129,7 +129,7 @@ const googleTrafficLayer = new TileLayer({
 const googleRoadsLayer = new TileLayer({
   title: "Google Roads",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://mt1.google.com/vt/lyrs=h&x={x}&y={y}&z={z}",
   }),
   type: "base",
@@ -138,7 +138,7 @@ const googleRoadsLayer = new TileLayer({
 const esriImageryLayer = new TileLayer({
   title: "ESRI Imagery",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
   }),
   type: "base",
@@ -147,7 +147,7 @@ const esriImageryLayer = new TileLayer({
 const esriStreetsLayer = new TileLayer({
   title: "ESRI Streets",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
   }),
   type: "base",
@@ -156,7 +156,7 @@ const esriStreetsLayer = new TileLayer({
 const esriTopoLayer = new TileLayer({
   title: "ESRI Topo",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
   }),
   type: "base",
@@ -165,16 +165,17 @@ const esriTopoLayer = new TileLayer({
 const esriTransportationLayer = new TileLayer({
   title: "ESRI Transportation",
   visible: false,
-  source: new OSM({
+  source: new XYZ({
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
   }),
   type: "base",
 });
 
-  // Añadir las capas a un grupo de capas base
+// Añadir las capas a un grupo de capas base
 const baseLayers = new LayerGroup({
   title: "Capas Base",
-  layers: [osmLayer,
+  layers: [
+    osmLayer,
     ortoPNOALayer,
     cartoDarkLayer,
     googleMapsLayer,
@@ -184,7 +185,8 @@ const baseLayers = new LayerGroup({
     esriImageryLayer,
     esriStreetsLayer,
     esriTopoLayer,
-    esriTransportationLayer,],
+    esriTransportationLayer,
+  ],
 });
 
 const map = new Map({
@@ -202,39 +204,30 @@ const map = new Map({
       rotate: true,
     }).extend(extendControls),
   });
+  const layerSwitcher = new LayerSwitcher({
+    tipLabel: "Leyenda", // Etiqueta del tooltip
+  });
+  map.addControl(layerSwitcher);
 
-// Crear el contenedor del botón LayerSwitcher
-const layerSwitcherButton = document.createElement('div');
-layerSwitcherButton.className = 'layer-switcher-button';
-layerSwitcherButton.innerHTML = 'Capas'; // Texto del botón
-layerSwitcherButton.onclick = () => {
-  const layerSwitcherContainer = document.getElementById('layerSwitcherContainer');
-  if (layerSwitcherContainer) {
-    layerSwitcherContainer.style.display =
-      layerSwitcherContainer.style.display === 'none' ? 'block' : 'none';
-  }
-};
+  baseLayers.getLayers().forEach((layer) => {
+    layer.on('change:visible', () => {
+      if (layer.getVisible()) {
+        baseLayers.getLayers().forEach((otherLayer) => {
+          if (otherLayer !== layer) {
+            otherLayer.setVisible(false);
+          }
+        });
+      }
+    });
+  });
 
-// Agregar el botón al contenedor de controles del mapa
-document.body.appendChild(layerSwitcherButton);
-
-// Crear el contenedor del LayerSwitcher
-const layerSwitcherContainer = document.createElement('div');
-layerSwitcherContainer.id = 'layerSwitcherContainer';
-layerSwitcherContainer.style.display = 'none'; // Ocultar inicialmente
-document.body.appendChild(layerSwitcherContainer);
-
-// Crear el LayerSwitcher
-const layerSwitcher = new LayerSwitcher({
-  tipLabel: "Capas", // Tooltip al pasar el mouse
-  groupSelectStyle: "group", // Muestra solo una capa base a la vez
-  target: layerSwitcherContainer, // Contenedor específico
-});
-
-// Agregar el LayerSwitcher al mapa
-map.addControl(layerSwitcher);
-
-sync(map);
+  document.getElementById('baseLayerSelect').addEventListener('change', (event) => {
+    const selectedLayerTitle = event.target.value;
+  
+    baseLayers.getLayers().forEach((layer) => {
+      layer.setVisible(layer.get('title') === selectedLayerTitle);
+    });
+  });
 
 // Llamar setupCSVHandlers después de que el mapa esté definido
 setupCSVHandlers(map, displaySearchResults);
