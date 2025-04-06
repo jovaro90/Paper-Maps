@@ -107,19 +107,6 @@ html, body {
 
 
 /* -------------- SIDEBAR INFO ---------------------------- */
-/* Barra minimapa */
-/* Minimapa visible */
-.ol-overviewmap {
-  position: absolute;
-  top: 80%; /* Asegúrate de que esté bien posicionado */
-  right: 100px; /* Posición inicial */
-  width: 150px;
-  height: 150px;
-  z-index: 2000; /* Para asegurarse de que esté sobre otros elementos */
-  transition: all 0.3s ease-in-out;  /* Transición suave */
-  visibility: visible;
-}
-
 /* Sidebar-right inicialmente oculta */
 .sidebar-right {
   position: fixed;
@@ -141,31 +128,6 @@ html, body {
   right: 0;
 }
 
-/* Ajuste del minimapa cuando la sidebar está abierta */
-.sidebar-right.open ~ .ol-overviewmap {
-  left: calc(92% - 400px); /* Mueve el minimapa hacia la izquierda para evitar la sidebar */
-}
-.sidebar-right.open .ol-overviewmap {
-  display: block !important; /* Asegura que el minimapa se muestre */
-  visibility: visible !important;
-}
-/* Ajuste del minimapa cuando la sidebar está abierta */
-.sidebar-right.open + .ol-overviewmap,
-.sidebar-right.open ~ .ol-overviewmap {
-  left: calc(100% - 520px) !important; /* Mueve el minimapa más a la izquierda */
-  transition: left 0.3s ease-in-out; /* Asegurar transición suave */
-  visibility: visible; /* Asegura que sea visible al abrir la sidebar */
-}
-
-/* Asegurar que el minimapa se ajuste correctamente */
-.sidebar-right.open ~ .ol-overviewmap {
-  position: absolute !important;
-  z-index: 1000 !important; /* Asegurar que esté por encima de otros elementos */
-  background: rgba(0, 0, 0, 0); /* Fondo transparente, para evitar un color gris */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 150px;
-  height: 150px;
-}
 
 @media (max-width: 600px) {
   .sidebar-right {
@@ -247,9 +209,12 @@ html, body {
 
 /* Estilos de la barra de escala */
 .ol-scale-bar {
+  position: absolute;
+  bottom: 10px; /* Posición en la parte inferior */
+  left: 50%; /* Centrar horizontalmente */
+  transform: translateX(-50%); /* Ajustar para centrar */
   background-color: rgba(0, 0, 0, 0.911); /* Fondo oscuro */
   border-radius: 7px; /* Bordes redondeados */
- 
   padding: 15px 9px; /* Espaciado interno */
   color: rgb(255, 255, 255); /* Texto blanco */
   box-shadow: 0 20px 8px rgba(0, 0, 0, 0); /* Sombra para dar profundidad */
@@ -273,11 +238,6 @@ html, body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
   z-index: 1000; /* Asegurar que esté por encima de otros elementos */
 }
-
-
-/*---------------------------------------------------------------*/
-/* ---------------------- MINIMAPA ---------------------------- */
-/*-------------------------------------------------------------*/
 
 
 /*---------------------------------------------------------------*/
@@ -309,6 +269,7 @@ html, body {
   font-family: Arial, sans-serif;
   box-shadow: 3px 0 10px rgba(0, 0, 0, 0.5);
   transition: left 0.3s ease;
+  z-index: 500;
 }
 
 /* Mostrar barra lateral al pasar el mouse */
@@ -814,7 +775,7 @@ html, body {
   padding: 20px;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 900;
 }
 
 .admin-sidebar h2 {
@@ -866,6 +827,9 @@ html, body {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   font-family: Arial, sans-serif;
   z-index: 990;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaciado entre los botones de zoom y el selector */
 }
 /* Estilo para el control de coordenadas */
 .coordinate_display {
@@ -881,10 +845,6 @@ html, body {
   z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
 
-/* Eliminar estilos de los controles de zoom */
-.ol-zoom {
-  display: none; /* Ocultar los controles de zoom */
-}
 
 /* Ocultar el ícono del LayerSwitcher */
 .ol-layerswitcher {
@@ -895,15 +855,20 @@ html, body {
   display: none !important; /* Asegúrate de que se aplique este estilo */
 }
 
+/* Eliminar estilos de los controles de zoom */
+.ol-zoom {
+  display: none; /* Ocultar los controles de zoom */
+}
 /* Contenedor de los botones de zoom */
 .zoom-controls {
   position: absolute;
-  top: 8.5%; /* Alineado con el selector de mapa base */
-  left: 50%; /* Posicionado al lado del selector */
+  top: 12.5%; /* Alineado con el selector de mapa base */
+  right: 97.5%; /* Posicionado al lado del selector */
   transform: translateX(-50%);
   z-index: 1000;
   display: flex;
   gap: 5px;
+  flex-direction: column; /* Alinea los botones verticalmente */
 }
 
 /* Botones de zoom */
@@ -913,7 +878,7 @@ html, body {
   border: 2px solid white;
   border-radius: 5px;
   padding: 5px 10px;
-  font-size: 16px;
+  font-size: 12px;
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, color 0.3s ease;
@@ -924,3 +889,22 @@ html, body {
   color: #fff;
 }
 
+/* Asegúrate de que el contenedor principal no cree un nuevo contexto de apilamiento */
+.container {
+  position: static; /* Cambiar de relative a static si no es necesario */
+  z-index: auto; /* No crear un nuevo contexto de apilamiento */
+}
+
+.minimap-container {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  width: 200px;
+  height: 200px;
+  z-index: 1500; /* Asegura que esté por encima de todo */
+  border: 2px solid #000000;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  overflow: hidden;
+}

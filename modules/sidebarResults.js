@@ -68,7 +68,7 @@ export function displaySearchResults(results) {
     popupContainer.style.display = 'flex'; // Mostrar el contenedor de resultados
     popupInfo.style.display = 'block';
   
-    generateStatistics(results); // Generar estadísticas
+    //generateStatistics(results); // Generar estadísticas
 
     
   }
@@ -238,9 +238,9 @@ export function displaySearchResults(results) {
   export function toggleSidebarResults() {
     const sidebar = document.getElementById('sidebarResults');
   const button = document.getElementById('toggleSidebarResultsBtn');
-  const minimap = document.querySelector('.ol-overviewmap');
 
-  if (!sidebar || !button || !minimap) {
+
+  if (!sidebar || !button ) {
     console.error('No se encontraron los elementos necesarios.');
     return;
   }
@@ -251,12 +251,7 @@ export function displaySearchResults(results) {
   // Cambiar el texto del botón según el estado de la barra lateral
   button.textContent = sidebar.classList.contains('open') ? 'Ocultar Resultados' : 'Mostrar Resultados';
 
-  // Ajustar la posición del minimapa
-  if (sidebar.classList.contains('open')) {
-    minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
-  } else {
-    minimap.style.right = '10px'; // Restaurar la posición original
-  }
+  
 }
 
 // Asegúrate de que la función esté disponible globalmente para el atributo `onclick`

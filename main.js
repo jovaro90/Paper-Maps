@@ -15,8 +15,7 @@ import {format} from "ol/coordinate";
 import XYZ from 'ol/source/XYZ';
 //librerias Controles
 import { defaults as defaultControls, MousePosition} from "ol/Control";
-import { OverviewMap } from 'ol/Control';
-import { ScaleLine } from 'ol/Control';
+import { ScaleLine, OverviewMap } from 'ol/Control';
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
@@ -39,24 +38,6 @@ const scaleControl2 = new ScaleLine ({
     minWidth: 150, // ancho minimo  
 });
 
-// 2.3 minimapa
-const OverviewMapControl = new OverviewMap ({
-    collapsed: false,
-    layers:[
-      new TileLayer({
-        source: new OSM (),
-      }),
-    ],
-  });
-  // Función para abrir/cerrar el minimapa
-let isMinimapOpen = true;
-document.getElementById('toggleMinimapBtn').addEventListener('click', function () {
-  isMinimapOpen = !isMinimapOpen;
-  OverviewMapControl.setCollapsed(!isMinimapOpen);
-  this.textContent = isMinimapOpen ? 'Cerrar Minimapa' : 'Abrir Minimapa';
-});
-
-
   // coordenadas puntero
 const mousePositionControl = new MousePosition({
   coordinateFormat: (coordinate) => {
@@ -65,15 +46,23 @@ const mousePositionControl = new MousePosition({
   projection: "EPSG:4326", // Proyección de las coordenadas
   className: "coordinate_display",
 });
+
+//minimapa
+const OverviewMapControl = new OverviewMap ({
+  layers:[
+    new TileLayer({
+      source: new OSM(),
+    }),
+  ],
+});
   
   
 // variable controles extendida:
 const extendControls = [
-  OverviewMapControl,
   scaleControl2,
+  OverviewMapControl,
   mousePositionControl,
 ];
-
 
 
 //-----------------------------------------------------------//
@@ -203,72 +192,14 @@ const map = new Map({
   layers: [baseLayers],
   view: new View({
     center: fromLonLat([2.186794, 41.401173]),
-    zoom: 13, // zoom inicial
+    zoom: 13,
   }),
   controls: defaultControls({
-    zoom: false, // Deshabilitar controles de zoom
+    zoom: false, 
     attribution: true,
     rotate: true,
   }).extend(extendControls),
-  interactions: defaultInteractions(), // Asegúrate de que las interacciones predeterminadas están habilitadas
-});
-
-const layerSwitcher = new LayerSwitcher({
-  tipLabel: "Leyenda", // Etiqueta del tooltip
-});
-  
-// Añadir el evento rendercomplete para manejar el minimapa
-map.once('rendercomplete', function () {
-  const minimap = document.querySelector('.ol-overviewmap.ol-unselectable.ol-control');
-  
-  if (minimap) {
-    // Asegúrate de que el minimapa sea visible y tenga los estilos correctos
-    minimap.style.visibility = 'visible';  // Asegura que el minimapa sea visible
-    minimap.style.zIndex = '2000';  // Asegura que esté por encima de otros elementos si es necesario
-    minimap.style.position = 'absolute'; // Cambiar a absoluto si es necesario
-    minimap.style.top = '80%';  // Ajuste de posición en la pantalla
-    minimap.style.right = '100px'; // Ajuste de posición a la derecha
-    minimap.style.width = '150px';  // Ajuste de tamaño
-    minimap.style.height = '150px'; // Ajuste de tamaño
-
-    console.log('Minimapa encontrado y visible.');
-  } else {
-    console.error('El minimapa no se encontró en el DOM.');
-  }
-
-  // Asignar el minimapa a una variable global para depuración
-  window.minimap = minimap;
-
-  document.getElementById('toggleSidebarResultsBtn').addEventListener('click', function () {
-    const sidebar = document.getElementById('sidebarResults');
-    const minimapContainer = document.querySelector('#minimapContainer');  // El contenedor del minimapa
-    const minimapMap = document.querySelector('.ol-overviewmap-map');  // El mapa del minimapa
-  
-    if (!sidebar || !minimapContainer || !minimapMap) {
-      console.error('No se encontraron los elementos necesarios.');
-      return;
-    }
-  
-    // Cambiar la clase del sidebar para que se muestre/oculte
-    sidebar.classList.toggle('open');
-  
-    // Mover tanto el contenedor como el mapa interior
-    if (sidebar.classList.contains('open')) {
-      // Ajustar la posición del contenedor minimap
-      minimapContainer.style.right = '420px';  // Mover el minimapa más a la izquierda
-      minimapMap.style.right = '420px'; // Asegurarnos de mover también el mapa interior
-      minimapContainer.style.transition = 'right 0.3s ease-in-out';  // Transición suave
-      minimapMap.style.transition = 'right 0.3s ease-in-out';  // Transición suave
-      console.log('Minimapa y mapa interior movidos a la izquierda:', minimapContainer.style.right);
-    } else {
-      // Restaurar la posición original
-      minimapContainer.style.right = '100px';  // Restaurar la posición original del contenedor
-      minimapMap.style.right = '100px'; // Restaurar la posición original del mapa interior
-      minimapContainer.style.transition = 'right 0.3s ease-in-out';  // Transición suave
-      minimapMap.style.transition = 'right 0.3s ease-in-out';  // Transición suave
-      console.log('Minimapa y mapa interior restaurados a la posición original:', minimapContainer.style.right);
-    }
-  });
+  interactions: defaultInteractions(), 
 });
   baseLayers.getLayers().forEach((layer) => {
     layer.on('change:visible', () => {
@@ -291,9 +222,41 @@ map.once('rendercomplete', function () {
   });
 
   
-
+  map.addControl(scaleControl2);
 // Llamar setupCSVHandlers después de que el mapa esté definido
 setupCSVHandlers(map, displaySearchResults);
+
+const minimap = new Map({
+  target: 'minimapContainer',
+  layers: [
+    new TileLayer({
+      source: new OSM(),
+    }),
+  ],
+  view: new View({
+    center: map.getView().getCenter(),
+    zoom: map.getView().getZoom() - 2,
+  }),
+  controls: [],
+});
+// Sincroniza la vista del minimapa con el mapa principal
+map.getView().on('change:center', () => {
+  minimap.getView().setCenter(map.getView().getCenter());
+});
+map.getView().on('change:zoom', () => {
+  minimap.getView().setZoom(map.getView().getZoom() - 2);
+});
+
+document.getElementById('toggleMinimapBtn').addEventListener('click', () => {
+  const minimapContainer = document.getElementById('minimapContainer');
+  if (minimapContainer.style.display === 'none' || minimapContainer.style.display === '') {
+    minimapContainer.style.display = 'block'; // Mostrar el minimapa
+    document.getElementById('toggleMinimapBtn').textContent = 'Cerrar Minimapa';
+  } else {
+    minimapContainer.style.display = 'none'; // Ocultar el minimapa
+    document.getElementById('toggleMinimapBtn').textContent = 'Abrir Minimapa';
+  }
+});
 
 //-------------------------------------------------------------------------
 // ------------------------------ MODULOS ---------------------------------
@@ -333,7 +296,7 @@ document.getElementById('searchBtn').addEventListener('click', function () {
   // Filtrar los datos según los criterios del usuario
   filteredResults = filterCSVData(csvData, location, theme, year, keyword);
 
-  // Mostrar los resultados filtrados
+  // Mostrar resultados filtrados
   document.getElementById('resultCount').textContent = `Resultados encontrados: ${filteredResults.length}`;
   displaySearchResults(filteredResults);
 
@@ -512,30 +475,7 @@ loadCSVData().then(data => {
   generateStatistics(allData);
 });
 
-document.getElementById('toggleResultsBtn').addEventListener('click', toggleResults);
-
-// Vincular el botón de la barra lateral con la funcionalidad
-document.getElementById('toggleSidebarBtn').addEventListener('click', toggleSidebarResults);
-
-document.getElementById('toggleSidebarResultsBtn').addEventListener('click', function () {
-  const sidebar = document.getElementById('sidebarResults');
-  const minimap = document.querySelector('.ol-overviewmap');
-
-  if (!sidebar || !minimap) {
-    console.error('No se encontraron los elementos necesarios.');
-    return;
-  }
-
-  sidebar.classList.toggle('open');
-
-  if (sidebar.classList.contains('open')) {
-    console.log('Sidebar abierta, moviendo minimapa');
-    minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
-  } else {
-    console.log('Sidebar cerrada, restaurando minimapa');
-    minimap.style.right = '100px'; // Restaurar la posición original
-  }
-});
+//document.getElementById('toggleResultsBtn').addEventListener('click', toggleResults);
 
 
 //-----------------------------------------------------------//

@@ -38,7 +38,7 @@
           
           <button id="toggleSidebarBtn" class="header-btn">Mostrar Resultados</button>
           <button id="selectAreaBtn" class="header-btn">Seleccionar Área</button>
-          <button id="toggleMinimapBtn" class="header-btn">Abrir Minimapa</button>
+          <button id="toggleMinimapBtn" class="header-btn">Abrir Minimapa</button> 
         </div>
         <div class="auth-section">
           <input type="text" id="username" placeholder="Usuario" />
@@ -113,21 +113,13 @@
 </div>
     </header>
 
-    <!-- Contenedor de la mapa -->
+    <!-- Contenedor del mapa -->
     <div class="container">
       <div id="map" class="map">
-        <!-- Los controles de zoom se agregarán automáticamente por OpenLayers -->
       </div>
-
-      <!-- Contenedor del minimapa dentro del contenedor principal -->
-      <div id="minimapContainer" class="ol-overviewmap">
-        <!-- Este es el minimapa dentro del mapa principal -->
-        <div class="ol-overviewmap-map"></div>
+      <div id="minimapContainer" class="minimap-container"></div>
       </div>
     </div>
-    <!-- Botón para alternar la visibilidad del sidebar -->
-<button id="toggleSidebarResultsBtn">Mostrar Resultados</button>
-<button id="toggleResultsBtn">Mostrar Resultados</button>
 
 <!-- Sidebar de resultados -->
 <div id="sidebarResults" class="sidebar-right">
@@ -147,6 +139,10 @@
 
 <!-- Contenedor para el botón o menú desplegable que permita cambiar entre los mapas base -->
 <div id="baseLayerSwitcher" class="base-layer-select">
+  <div id="zoomControls" class="zoom-controls">
+    <button id="zoomInBtn" class="zoom-btn">+</button>
+    <button id="zoomOutBtn" class="zoom-btn">-</button>
+  </div>
   <label for="baseLayerSelect">Seleccionar Mapa Base:</label>
   <select id="baseLayerSelect">
     <option value="OSM">OSM</option>
@@ -161,11 +157,6 @@
     <option value="ESRI Topo">ESRI Topo</option>
     <option value="ESRI Transportation">ESRI Transportation</option>
   </select>
-</div>
-
-<div id="zoomControls" class="zoom-controls">
-  <button id="zoomInBtn" class="zoom-btn">+</button>
-  <button id="zoomOutBtn" class="zoom-btn">-</button>
 </div>
 
     <script>
@@ -233,26 +224,7 @@
         <div id="resultCount">Resultados encontrados: 0</div>
       </div>
     </div>
-
-
-
-<!----------- ROL USUARIOS ------------------>
-
-  <!-- Botones restringidos por roles -->
-  <div id="roleActions">
-    <button id="editBtn">Editar</button>
-    <button id="deleteBtn">Eliminar</button>
-    <button id="viewStatsBtn">Ver Estadísticas</button>
   </div>
-
-  <!-- Selector de rol de usuario -->
-  <div id="roleSelector">
-    <label for="userRole">Seleccionar Rol:</label>
-    <select id="userRole">
-      <option value="admin">Administrador</option>
-      <option value="user">Editor</option>
-      <option value="viewer" >Visualizador</option>
-    </select>
   </div>
 
     <!-- Popup de registro -->
