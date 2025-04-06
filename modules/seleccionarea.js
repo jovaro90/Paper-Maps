@@ -10,11 +10,25 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
     type: 'Polygon',
   });
 
+  const mapViewport = map.getViewport();
+
+  // Función para bloquear eventos de clic
+  const blockClickHandler = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+  };
+
+  // Bloquear clics en el mapa
+  mapViewport.addEventListener('click', blockClickHandler, true);
+
   map.addInteraction(drawInteraction);
 
   drawInteraction.on('drawend', function (event) {
     const areaPolygon = event.feature.getGeometry();
     console.log('Coordenadas del polígono:', areaPolygon.getCoordinates());
+
+    // Restaurar los clics en el mapa
+    mapViewport.removeEventListener('click', blockClickHandler, true);
 
     // Verificar puntos representados
     console.log('Puntos representados:', representedPoints);
@@ -66,5 +80,12 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
 
     // Eliminar la interacción de dibujo después de completar el área
     map.removeInteraction(drawInteraction);
+  });
+
+  // Restaurar los clics si se cancela la interacción
+  drawInteraction.on('change:active', function () {
+    if (!drawInteraction.getActive()) {
+      mapViewport.removeEventListener('click', blockClickHandler, true);
+    }
   });
 }

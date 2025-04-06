@@ -207,8 +207,40 @@ const map = new Map({
   const layerSwitcher = new LayerSwitcher({
     tipLabel: "Leyenda", // Etiqueta del tooltip
   });
-  map.addControl(layerSwitcher);
+  
+// Añadir el evento rendercomplete para manejar el minimapa
+map.once('rendercomplete', function () {
+  console.log('Evento rendercomplete ejecutado');
+  const minimap = document.querySelector('.ol-overviewmap.ol-unselectable.ol-control');
+  console.log('Minimapa:', minimap);
 
+  if (!minimap) {
+    console.error('El minimapa no se encontró en el DOM.');
+    return;
+  }
+
+  // Asignar el minimapa a una variable global para depuración
+  window.minimap = minimap;
+
+  document.getElementById('toggleSidebarResultsBtn').addEventListener('click', function () {
+    const sidebar = document.getElementById('sidebarResults');
+
+    if (!sidebar || !minimap) {
+      console.error('No se encontraron los elementos necesarios.');
+      return;
+    }
+
+    sidebar.classList.toggle('open');
+
+    if (sidebar.classList.contains('open')) {
+      console.log('Sidebar abierta, moviendo minimapa');
+      minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
+    } else {
+      console.log('Sidebar cerrada, restaurando minimapa');
+      minimap.style.right = '100px'; // Restaurar la posición original
+    }
+  });
+});
   baseLayers.getLayers().forEach((layer) => {
     layer.on('change:visible', () => {
       if (layer.getVisible()) {
@@ -228,6 +260,8 @@ const map = new Map({
       layer.setVisible(layer.get('title') === selectedLayerTitle);
     });
   });
+
+  
 
 // Llamar setupCSVHandlers después de que el mapa esté definido
 setupCSVHandlers(map, displaySearchResults);
@@ -430,26 +464,14 @@ document.getElementById('toggleSidebarResultsBtn').addEventListener('click', fun
     return;
   }
 
-  // Alternar la clase "open" en la barra lateral
   sidebar.classList.toggle('open');
 
-  // Actualizar el estado del botón usando la función
-  //updateSidebarButtonState(sidebar.classList.contains('open'));
-
-  // Ajustar la posición del minimapa
   if (sidebar.classList.contains('open')) {
+    console.log('Sidebar abierta, moviendo minimapa');
     minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
   } else {
-    minimap.style.right = '10px'; // Restaurar la posición original
-  }
-});
-
-// Mostrar la sidebar-right automáticamente al buscar
-document.getElementById('searchBtn').addEventListener('click', function () {
-  const sidebar = document.getElementById('sidebarResults');
-  if (!sidebar.classList.contains('open')) {
-    sidebar.classList.add('open');
-    updateSidebarButtonState(true); // Actualizar el estado del botón
+    console.log('Sidebar cerrada, restaurando minimapa');
+    minimap.style.right = '100px'; // Restaurar la posición original
   }
 });
 

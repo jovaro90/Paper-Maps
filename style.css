@@ -35,7 +35,7 @@ html, body {
   color: rgb(255, 255, 255);
   text-align: center;
   position: relative; /* Cambiar a relative */
-  z-index: 900; /* Asegurar que esté debajo de los botones pero encima del mapa */
+  z-index: 800; /* Asegurar que esté debajo de los botones pero encima del mapa */
   padding: 2px 0; /* Reducir el espacio entre el borde y la cabecera */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -44,13 +44,15 @@ html, body {
   max-width: 800px;
   margin: 0 auto;
   padding: 5px;
+  z-index: 800; 
 }
 
 .header-content h1 {
-  font-size: 5rem;
+  font-size: 2rem;
   margin-bottom: 5px;
   margin-top: 0; /* Reducir el espacio entre el título y el borde superior */
   font-weight: bold;
+  font-family: Arial, sans-serif;
 }
 
 .header-content p {
@@ -103,30 +105,22 @@ html, body {
   background: #d3d0d0; /* Color más oscuro al pasar el mouse */
 }
 
-/* Estilo para los controles de zoom */
-.ol-zoom {
-  position: absolute;
-  top: 140px; /* Alineado con el LayerSwitcher */
-  left: calc(50% + 180px); /* Posicionado al lado derecho del LayerSwitcher */
-  transform: translateX(-50%);
-  z-index: 1000; /* Asegurar que esté por encima del mapa */
-}
-
-.ol-zoom button {
-  background-color: black; /* Fondo negro */
-  color: white; /* Texto blanco */
-  border-radius: 5px;
-  padding: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 2px; /* Espaciado entre botones */
-}
-
-.ol-zoom button:hover {
-  background-color: #333; /* Fondo más claro al pasar el mouse */
-}
 
 /* -------------- SIDEBAR INFO ---------------------------- */
+/* Barra minimapa */
+.ol-overviewmap {
+  position: absolute;
+  top: 82.5%;
+  left: 92%; /* Posición inicial en la parte derecha */
+  transform: translateX(-50%); /* Centrado del minimapa */
+  width: 150px;
+  height: 150px;
+  background: rgba(0, 0, 0, 0); /* Fondo transparente */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: left 0.3s ease-in-out; /* Transición suave al mover */
+}
+
 /* Sidebar-right inicialmente oculta */
 .sidebar-right {
   position: fixed;
@@ -140,12 +134,38 @@ html, body {
   font-family: Arial, sans-serif;
   box-shadow: -3px 0 10px rgba(0, 0, 0, 0.1);
   transition: right 0.3s ease-in-out;
-  z-index: 1000;
+  z-index: 1100;
 }
 
 /* Mostrar la sidebar cuando esté visible */
 .sidebar-right.open {
   right: 0;
+}
+
+/* Ajuste del minimapa cuando la sidebar está abierta */
+.sidebar-right.open ~ .ol-overviewmap {
+  left: calc(92% - 400px); /* Mueve el minimapa hacia la izquierda para evitar la sidebar */
+}
+.sidebar-right.open .ol-overviewmap {
+  display: block !important; /* Asegura que el minimapa se muestre */
+  visibility: visible !important;
+}
+/* Ajuste del minimapa cuando la sidebar está abierta */
+.sidebar-right.open + .ol-overviewmap,
+.sidebar-right.open ~ .ol-overviewmap {
+  left: calc(100% - 520px) !important; /* Mueve el minimapa más a la izquierda */
+  transition: left 0.3s ease-in-out; /* Asegurar transición suave */
+  visibility: visible; /* Asegura que sea visible al abrir la sidebar */
+}
+
+/* Asegurar que el minimapa se ajuste correctamente */
+.sidebar-right.open ~ .ol-overviewmap {
+  position: absolute !important;
+  z-index: 1000 !important; /* Asegurar que esté por encima de otros elementos */
+  background: rgba(0, 0, 0, 0); /* Fondo transparente, para evitar un color gris */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 150px;
+  height: 150px;
 }
 
 @media (max-width: 600px) {
@@ -233,12 +253,14 @@ html, body {
   padding: 15px 9px; /* Espaciado interno */
   color: rgb(255, 255, 255); /* Texto blanco */
   box-shadow: 0 20px 8px rgba(0, 0, 0, 0); /* Sombra para dar profundidad */
+  z-index: 1011; /* Asegurar que esté por encima de otros elementos */
 }
 
 /* texto barra de la escala */
 .ol-scale-bar-text {
   font-weight: bold; /* Fuente en negrita */
   text-shadow: 10px 1px 2px rgba(0, 0, 0, 0.5); /* Sombra en el texto */
+  z-index: 1000; /* Asegurar que esté por encima de otros elementos */
 }
 
 /* texto de la escala */
@@ -249,6 +271,7 @@ html, body {
   font-size: 16px; /* Tamaño de la fuente */
   font-weight: bold;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.0);
+  z-index: 1000; /* Asegurar que esté por encima de otros elementos */
 }
 
 
@@ -256,23 +279,7 @@ html, body {
 /* ---------------------- MINIMAPA ---------------------------- */
 /*-------------------------------------------------------------*/
 
-/* Barra minimapa */
-.ol-overviewmap {
-  position: absolute;
-  top: 82.5%;
-  left: 92%;
-  transform: translate(-50%);
-  width: 150px;
-  height: 150px;
-  background: rgba(0, 0, 0, 0); /* Fondo con transparencia */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: right 0.3s ease-in-out, top 0.3s ease-in-out; /* Transición suave */
-}
-/* Ajuste del minimapa cuando la sidebar está abierta */
-.sidebar-right.open ~ .ol-overviewmap {
-  right: 820px; /* Mueve el minimapa hacia la izquierda para evitar la sidebar */
-}
+
 /*---------------------------------------------------------------*/
 /* -------------- SIDEBAR IZQUIERDA BUSQUEDA ------------------ */
 /*-------------------------------------------------------------*/
@@ -286,7 +293,7 @@ html, body {
   height: 100%;
   width: 40px; /* Ancho del área sensible al cursor */
   transition: width 0.3s ease;
-  z-index: 1000;
+  z-index: 999;
 }
 
 /* Barra lateral para búsqueda */
@@ -629,38 +636,29 @@ html, body {
 }
 
 /* Estilos para el contenedor de usuario y rol */
-.user-info {
-  position: absolute;
-  top: 61px;
-  left: 1642px;
-  background-color: rgba(0, 0, 0, 0);
-  color: white;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 14px;
-  text-align: right;
-}
 
-.user-info span {
-  display: block;
-}
 
 /* Estilos para la información del usuario y rol en la cabecera */
-.user-info {
+#userInfo {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  margin-top: 10px;
-  color: rgb(0, 0, 0);
-  font-size: 17px;
+  position: absolute; /* Asegura que se pueda posicionar */
+  top: 20px; /* Ajusta la distancia desde la parte superior */
+  left: 650px; /* Mueve el contenedor hacia la derecha */
+  background-color: rgba(0, 0, 0, 0); /* Fondo semitransparente opcional */
+  padding: 10px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  color: #ffffff; /* Color del texto */
+  font-size: 14px;
   font-weight: bold;
 }
-
-.user-info span {
+/* Estilo para los spans dentro de #userInfo */
+#userInfo span {
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 1px;
+  color: #ffffff; /* Cambiar el color de los spans */
 }
-
 /* Estilo para el formulario de agregar datos */
 #addDataForm {
   display: none; /* Oculto por defecto */
@@ -800,8 +798,8 @@ html, body {
   cursor: pointer;
   transition: background 0.3s ease;
   position: absolute;
-  top: 90px;
-  right: 375px; /* Ajusta la distancia desde el borde derecho */
+  top: 38px;
+  right: 625px; /* Ajusta la distancia desde el borde derecho */
 }
 
 #addDataBtn:hover {
@@ -863,16 +861,63 @@ html, body {
 
 .base-layer-select {
   position: absolute;
-  top: 140px;
-  left: 340px;
+  top: 8.5%;
+  left: 40%;
   z-index: 1000;
-  background-color: rgb(2, 2, 2);
+  background-color: rgb(2, 2, 2, 0.7);
   color: white;
   padding: 10px;
   border-color: white;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   font-family: Arial, sans-serif;
+  z-index: 990;
+}
+/* Estilo para el control de coordenadas */
+.coordinate_display {
+  position: absolute;
+  top: 12.5%; /* Ajusta la posición desde la parte inferior */
+  left: 40%; /* Ajusta la posición desde la parte izquierda */
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo semitransparente */
+  color: #ffffff; /* Texto blanco */
+  padding: 5px 10px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados */
+  font-size: 14px; /* Tamaño de la fuente */
+  font-family: Arial, sans-serif; /* Fuente */
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
 
+/* Estilo para los controles de zoom */
+.ol-zoom {
+  position: absolute;
+  top: 8%; /* Alineado con el LayerSwitcher */
+  left: 39.15%; /* Posicionado al lado derecho del LayerSwitcher */
+  transform: translateX(-50%);
+  z-index: 1000; /* Asegurar que esté por encima del mapa */
+  background: none; /* Elimina el fondo */
+  border: none; /* Elimina cualquier borde */
+  box-shadow: none; /* Elimina cualquier sombra */
+}
+
+.ol-zoom button {
+  background-color: black; /* Fondo negro */
+  color: white; /* Texto blanco */
+  border-radius: 5px;
+  padding: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin: 10px; /* Espaciado entre botones */
+}
+
+.ol-zoom button:hover {
+  background-color: #333; /* Fondo más claro al pasar el mouse */
+}
+/* Ocultar el ícono del LayerSwitcher */
+.ol-layerswitcher {
+  display: none; /* Oculta el control predeterminado */
+}
+
+.ol-layerswitcher {
+  display: none !important; /* Asegúrate de que se aplique este estilo */
+}
 
