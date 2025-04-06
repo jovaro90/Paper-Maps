@@ -489,19 +489,32 @@ document.getElementById('toggleMinimapBtn').addEventListener('click', function (
 
 
 // Función para cerrar el popup de información
+
 document.addEventListener('DOMContentLoaded', function () {
-  const closePopupButton = document.getElementById('closePopup');
+  // Asegúrate de que el DOM está completamente cargado
+  console.log('DOM completamente cargado y analizado.');
+
+  const closePopupButton = document.getElementById('closePopup1');
   const popupContainer = document.getElementById('popupContainer');
 
-  if (closePopupButton && popupContainer) {
-    closePopupButton.addEventListener('click', function () {
-      popupContainer.style.display = 'none';
-    });
-  } else {
-    console.error('El botón o el contenedor del popup no se encontraron.');
+  if (!closePopupButton) {
+    console.error('El botón con ID "closePopup1" no se encontró en el DOM. Verifica el ID.');
+    return; // Salir si el botón no existe
   }
-});
 
+  if (!popupContainer) {
+    console.error('El contenedor con ID "popupContainer" no se encontró en el DOM. Verifica el ID.');
+    return; // Salir si el contenedor no existe
+  }
+
+  closePopupButton.addEventListener('click', function () {
+    console.log('Botón de cerrar popup clicado.');
+    popupContainer.style.display = 'none'; // Oculta el popup
+  });
+
+  console.log('Evento de cierre del popup configurado correctamente.');
+});
+    
 
 //-----------------------------------------------------------//
 /*--------------ROLES DE USUARIO-------------------------- */

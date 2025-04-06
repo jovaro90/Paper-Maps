@@ -114,26 +114,9 @@ export function addFilteredPointsToMap(map, filteredResults) {
             console.log('Ningún punto seleccionado.');
         }
     });
-
-    map.addInteraction(selectInteraction);
-
-    // Función para cerrar el popup
-    const closePopupButton = document.getElementById('closePopupButton');
-    if (closePopupButton) {
-        closePopupButton.addEventListener('click', function () {
-            popupContainer.style.display = 'none';
-            overlay.setPosition(undefined);
-        });
-    }
 }
 
+  
+
     map.addInteraction(selectInteraction);
 
-    // Función para cerrar el popup
-    const closePopupButton = document.getElementById('closePopupButton');
-    if (closePopupButton) {
-        closePopupButton.addEventListener('click', function () {
-            popupContainer.style.display = 'none';
-            overlay.setPosition(undefined);
-        });
-    }

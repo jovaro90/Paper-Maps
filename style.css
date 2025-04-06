@@ -419,25 +419,27 @@ html, body {
 /*---------------------------------------------------------------*/
 /* --------------- POPUP INFO CLIC ---------------------------- */
 /*-------------------------------------------------------------*/
-
-
 /* Estilo para el contenedor del popup */
 #popupContainer {
+  display: none; /* Ocultamos el popup inicialmente */
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
-  display: none; /* Ocultamos el popup inicialmente */
+  min-width: 300px;
+  gap: 10px;
   justify-content: center;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
   z-index: 10000; /* Asegura que esté por encima de otros elementos */
 }
 
 /* Estilo para el propio popup */
 #popupInfo {
-  background-color: #192431;
+  background-color: #000000;
   color: #ffffff;
   width: 80%; /* Puedes ajustarlo a tu gusto */
   max-width: 600px; /* Máximo tamaño de ancho */
@@ -451,6 +453,7 @@ html, body {
   justify-content: space-between;
 }
 
+/* Estilo para el contenido del popup */
 #popupInfoContent {
   flex-grow: 1; /* Hace que el contenido ocupe el espacio disponible */
 }
@@ -494,22 +497,6 @@ html, body {
 
 /* -------------- POPUPS ---------------------------- */
 
-/* Estilos para los popups */ 
-#popupContainer {
-  display: none;
-  gap: 10px;
-  min-width: 300px;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0); /*fondo popups*/
-  z-index: 1000;
-}
-
 .popup {
   display: none;
   background-color: rgba(0, 0, 0, 0);
@@ -541,12 +528,15 @@ html, body {
 }
 
 .popup-content {
-  background-color: white;
-  padding: 20px;
+  background-color: rgb(0, 0, 0);
+  color: white;
+  padding: 30px;
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 300px;
   text-align: center;
+  
+  
 }
 
 .popup-content input,
@@ -556,17 +546,19 @@ html, body {
   margin: 10px 0;
   border: 1px solid #ccc;
   border-radius: 5px;
+  text-align: center;
 }
 
 .popup-content button {
-  background-color: #4CAF50;
+  background-color: #050505;
   color: white;
-  border: none;
+  border: white;
   padding: 10px 20px;
   font-size: 14px;
   border-radius: 5px;
   cursor: pointer;
   margin: 5px;
+  text-align: center;
 }
 
 .popup-content button:hover {
