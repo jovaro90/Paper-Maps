@@ -3,8 +3,13 @@ import { fromLonLat } from 'ol/proj';
 import { Draw } from 'ol/interaction';
 import { Style, Circle as CircleStyle, Fill, Stroke } from 'ol/style';
 import { containsCoordinate } from 'ol/extent';
+import { setSelectingArea } from './selectionState.js';
+import { displaySearchResults } from './sidebarResults.js';
+import Select from 'ol/interaction/Select';
 
 export function enableAreaSelection(map, representedPoints, filteredResults) {
+  setSelectingArea(true);
+
   const drawInteraction = new Draw({
     source: new ol.source.Vector(),
     type: 'Polygon',
@@ -12,14 +17,34 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
 
   const mapViewport = map.getViewport();
 
-  // Función para bloquear eventos de clic
   const blockClickHandler = (event) => {
     event.stopPropagation();
     event.preventDefault();
   };
 
-  // Bloquear clics en el mapa
+  const cancelHandler = (event) => {
+    event.preventDefault();
+    cleanup();
+  };
+
+  const cleanup = () => {
+    map.removeInteraction(drawInteraction);
+    mapViewport.removeEventListener('click', blockClickHandler, true);
+    mapViewport.removeEventListener('contextmenu', cancelHandler, true);
+    setSelectingArea(false);
+
+    // Reactivar la interacción de selección después de la selección de área
+    selectInteraction.setActive(true);
+  };
+
+  // Desactivar la interacción de selección mientras se dibuja el área
+  const selectInteraction = map.getInteractions().getArray().find(interaction => interaction instanceof Select);
+  if (selectInteraction) {
+    selectInteraction.setActive(false);
+  }
+
   mapViewport.addEventListener('click', blockClickHandler, true);
+  mapViewport.addEventListener('contextmenu', cancelHandler, true);
 
   map.addInteraction(drawInteraction);
 
@@ -27,13 +52,8 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
     const areaPolygon = event.feature.getGeometry();
     console.log('Coordenadas del polígono:', areaPolygon.getCoordinates());
 
-    // Restaurar los clics en el mapa
-    mapViewport.removeEventListener('click', blockClickHandler, true);
+    cleanup();
 
-    // Verificar puntos representados
-    console.log('Puntos representados:', representedPoints);
-
-    // Filtrar los puntos dentro del área seleccionada
     const pointsInArea = representedPoints.filter(point => {
       const pointCoordinates = point.getGeometry().getCoordinates();
       return areaPolygon.intersectsCoordinate(pointCoordinates);
@@ -42,50 +62,48 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
     console.log('Puntos seleccionados dentro del área:', pointsInArea);
 
     if (pointsInArea.length > 0) {
-      // Cambiar el estilo de los puntos seleccionados
       pointsInArea.forEach(point => {
         point.setStyle(new Style({
           image: new CircleStyle({
             radius: 6,
-            fill: new Fill({
-              color: '#FF9800', // Cambiar el color para los puntos seleccionados
-            }),
-            stroke: new Stroke({
-              color: '#000000',
-              width: 2,
-            }),
+            fill: new Fill({ color: '#FF9800' }),
+            stroke: new Stroke({ color: '#000000', width: 2 }),
           }),
         }));
       });
 
-      // Actualizar la barra lateral con los puntos seleccionados
       updateSidebarWithSelectedPoints(pointsInArea);
     } else {
       console.warn('No se encontraron puntos dentro del área seleccionada.');
     }
 
-    // Actualizar `filteredResults` eliminando los puntos fuera del área
-    filteredResults = filteredResults.filter(item => {
+    // Filtrar y adaptar los resultados
+    const selectedResults = filteredResults.filter(item => {
       const pointCoordinates = fromLonLat([parseFloat(item.Longitud), parseFloat(item.Latitud)]);
       return areaPolygon.intersectsCoordinate(pointCoordinates);
     }).map(item => ({
       Nombre: item.Nombre || 'Sin nombre',
+      ubicacion: `${item.ubicacion || 'Ubicación no disponible'}`,
+      tematica: item.tematica || 'No disponible',
+      anio: item.anio || 'No disponible',
+      usuario: item.usuario || 'No disponible',
       descripcion: item.descripcion || 'Sin descripción',
-      link: item.link || '#',
-      Latitud: item.Latitud,
-      Longitud: item.Longitud,
+      link: item.link || '#'
     }));
 
-    console.log('Resultados filtrados actualizados:', filteredResults);
+    console.log('Resultados filtrados actualizados:', selectedResults);
 
-    // Eliminar la interacción de dibujo después de completar el área
-    map.removeInteraction(drawInteraction);
+    // Mostrar los resultados en el popup usando displaySearchResults
+    displaySearchResults(selectedResults);
   });
 
-  // Restaurar los clics si se cancela la interacción
   drawInteraction.on('change:active', function () {
     if (!drawInteraction.getActive()) {
-      mapViewport.removeEventListener('click', blockClickHandler, true);
+      cleanup();
     }
   });
+
+  return {
+    cancelSelection: cleanup
+  };
 }

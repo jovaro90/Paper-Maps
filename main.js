@@ -20,6 +20,7 @@ import { ScaleLine } from 'ol/Control';
 //import 'ol-layerswitcher/dist/ol-layerswitcher.css';
 import LayerSwitcher from 'ol-layerswitcher';
 import LayerGroup from 'ol/layer/Group';
+import { defaults as defaultInteractions } from 'ol/interaction';
 
 
 
@@ -47,6 +48,14 @@ const OverviewMapControl = new OverviewMap ({
       }),
     ],
   });
+  // Función para abrir/cerrar el minimapa
+let isMinimapOpen = true;
+document.getElementById('toggleMinimapBtn').addEventListener('click', function () {
+  isMinimapOpen = !isMinimapOpen;
+  OverviewMapControl.setCollapsed(!isMinimapOpen);
+  this.textContent = isMinimapOpen ? 'Cerrar Minimapa' : 'Abrir Minimapa';
+});
+
 
   // coordenadas puntero
 const mousePositionControl = new MousePosition({
@@ -196,27 +205,35 @@ const map = new Map({
     center: fromLonLat([2.186794, 41.401173]),
     zoom: 13, // zoom inicial
   }),
-  
   controls: defaultControls({
-      //gestion controles por defecto
-      zoom: true,
-      attribution: true,
-      rotate: true,
-    }).extend(extendControls),
-  });
-  const layerSwitcher = new LayerSwitcher({
-    tipLabel: "Leyenda", // Etiqueta del tooltip
-  });
+    zoom: false, // Deshabilitar controles de zoom
+    attribution: true,
+    rotate: true,
+  }).extend(extendControls),
+  interactions: defaultInteractions(), // Asegúrate de que las interacciones predeterminadas están habilitadas
+});
+
+const layerSwitcher = new LayerSwitcher({
+  tipLabel: "Leyenda", // Etiqueta del tooltip
+});
   
 // Añadir el evento rendercomplete para manejar el minimapa
 map.once('rendercomplete', function () {
-  console.log('Evento rendercomplete ejecutado');
   const minimap = document.querySelector('.ol-overviewmap.ol-unselectable.ol-control');
-  console.log('Minimapa:', minimap);
+  
+  if (minimap) {
+    // Asegúrate de que el minimapa sea visible y tenga los estilos correctos
+    minimap.style.visibility = 'visible';  // Asegura que el minimapa sea visible
+    minimap.style.zIndex = '2000';  // Asegura que esté por encima de otros elementos si es necesario
+    minimap.style.position = 'absolute'; // Cambiar a absoluto si es necesario
+    minimap.style.top = '80%';  // Ajuste de posición en la pantalla
+    minimap.style.right = '100px'; // Ajuste de posición a la derecha
+    minimap.style.width = '150px';  // Ajuste de tamaño
+    minimap.style.height = '150px'; // Ajuste de tamaño
 
-  if (!minimap) {
+    console.log('Minimapa encontrado y visible.');
+  } else {
     console.error('El minimapa no se encontró en el DOM.');
-    return;
   }
 
   // Asignar el minimapa a una variable global para depuración
@@ -224,20 +241,32 @@ map.once('rendercomplete', function () {
 
   document.getElementById('toggleSidebarResultsBtn').addEventListener('click', function () {
     const sidebar = document.getElementById('sidebarResults');
-
-    if (!sidebar || !minimap) {
+    const minimapContainer = document.querySelector('#minimapContainer');  // El contenedor del minimapa
+    const minimapMap = document.querySelector('.ol-overviewmap-map');  // El mapa del minimapa
+  
+    if (!sidebar || !minimapContainer || !minimapMap) {
       console.error('No se encontraron los elementos necesarios.');
       return;
     }
-
+  
+    // Cambiar la clase del sidebar para que se muestre/oculte
     sidebar.classList.toggle('open');
-
+  
+    // Mover tanto el contenedor como el mapa interior
     if (sidebar.classList.contains('open')) {
-      console.log('Sidebar abierta, moviendo minimapa');
-      minimap.style.right = '420px'; // Mover el minimapa hacia la izquierda
+      // Ajustar la posición del contenedor minimap
+      minimapContainer.style.right = '420px';  // Mover el minimapa más a la izquierda
+      minimapMap.style.right = '420px'; // Asegurarnos de mover también el mapa interior
+      minimapContainer.style.transition = 'right 0.3s ease-in-out';  // Transición suave
+      minimapMap.style.transition = 'right 0.3s ease-in-out';  // Transición suave
+      console.log('Minimapa y mapa interior movidos a la izquierda:', minimapContainer.style.right);
     } else {
-      console.log('Sidebar cerrada, restaurando minimapa');
-      minimap.style.right = '100px'; // Restaurar la posición original
+      // Restaurar la posición original
+      minimapContainer.style.right = '100px';  // Restaurar la posición original del contenedor
+      minimapMap.style.right = '100px'; // Restaurar la posición original del mapa interior
+      minimapContainer.style.transition = 'right 0.3s ease-in-out';  // Transición suave
+      minimapMap.style.transition = 'right 0.3s ease-in-out';  // Transición suave
+      console.log('Minimapa y mapa interior restaurados a la posición original:', minimapContainer.style.right);
     }
   });
 });
@@ -319,6 +348,8 @@ document.getElementById('searchBtn').addEventListener('click', function () {
 
 
 import { addFilteredPointsToMap } from './modules/csvHandler.js';
+import { addFilteredPointsToMap1 } from './modules/mapMarkers.js';
+addFilteredPointsToMap1(map, filteredResults);
 
 document.getElementById('searchBtn').addEventListener('click', function () {
   if (!csvData || csvData.length === 0) {
@@ -343,6 +374,31 @@ document.getElementById('searchBtn').addEventListener('click', function () {
 });
 
 
+// Función para cerrar el popup de información
+console.log('Archivo main.js cargado.');
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('DOM completamente cargado y analizado.');
+
+  const closePopupButton = document.getElementById('closePopup1');
+  const popupContainer = document.getElementById('popupContainer');
+
+  if (!closePopupButton) {
+    console.error('El botón con ID "closePopup1" no se encontró en el DOM. Verifica el ID.');
+    return;
+  }
+
+  if (!popupContainer) {
+    console.error('El contenedor con ID "popupContainer" no se encontró en el DOM. Verifica el ID.');
+    return;
+  }
+
+  closePopupButton.addEventListener('click', function () {
+    console.log('Botón de cerrar popup clicado.');
+    popupContainer.style.display = 'none'; // Oculta el popup
+  });
+
+  console.log('Evento de cierre del popup configurado correctamente.');
+});
 
 //-----------------------------------------------------------//
 /*-------------- AGREGAR NUEVOS DATOS --------------------- */
@@ -420,11 +476,17 @@ document.getElementById('registerBtn').addEventListener('click', openRegisterPop
 
 // Función para habilitar el dibujo de un área
 import { enableAreaSelection } from './modules/seleccionarea.js';
+let selectionControl = null;
 
-// Vincular la funcionalidad de selección de área a un botón
-document.getElementById('selectAreaBtn').addEventListener('click', function () {
-  enableAreaSelection(map, representedPoints, filteredResults);
+document.getElementById('selectAreaBtn').addEventListener('click', () => {
+  if (selectionControl) {
+    selectionControl.cancelSelection(); // cancelar si ya está activa
+    selectionControl = null;
+  } else {
+    selectionControl = enableAreaSelection(map, representedPoints, filteredResults);
+  }
 });
+// Vincular la funcionalidad de selección de área a un botón
 
 
 
@@ -476,46 +538,6 @@ document.getElementById('toggleSidebarResultsBtn').addEventListener('click', fun
 });
 
 
-//------------------------------------------------------------//
-
-
-// Función para abrir/cerrar el minimapa
-let isMinimapOpen = true;
-document.getElementById('toggleMinimapBtn').addEventListener('click', function () {
-  isMinimapOpen = !isMinimapOpen;
-  OverviewMapControl.setCollapsed(!isMinimapOpen);
-  this.textContent = isMinimapOpen ? 'Cerrar Minimapa' : 'Abrir Minimapa';
-});
-
-
-// Función para cerrar el popup de información
-
-document.addEventListener('DOMContentLoaded', function () {
-  // Asegúrate de que el DOM está completamente cargado
-  console.log('DOM completamente cargado y analizado.');
-
-  const closePopupButton = document.getElementById('closePopup1');
-  const popupContainer = document.getElementById('popupContainer');
-
-  if (!closePopupButton) {
-    console.error('El botón con ID "closePopup1" no se encontró en el DOM. Verifica el ID.');
-    return; // Salir si el botón no existe
-  }
-
-  if (!popupContainer) {
-    console.error('El contenedor con ID "popupContainer" no se encontró en el DOM. Verifica el ID.');
-    return; // Salir si el contenedor no existe
-  }
-
-  closePopupButton.addEventListener('click', function () {
-    console.log('Botón de cerrar popup clicado.');
-    popupContainer.style.display = 'none'; // Oculta el popup
-  });
-
-  console.log('Evento de cierre del popup configurado correctamente.');
-});
-    
-
 //-----------------------------------------------------------//
 /*--------------ROLES DE USUARIO-------------------------- */
 //---------------------------------------------------------//
@@ -547,3 +569,29 @@ let currentUserRole = 'viewer'; // Cambiar según el rol del usuario
 function hasPermission(action) {
   return roles[currentUserRole] && roles[currentUserRole][action];
 }
+
+// Funcionalidad de los botones de zoom
+window.addEventListener('load', () => {
+  const zoomInBtn = document.getElementById('zoomInBtn');
+  const zoomOutBtn = document.getElementById('zoomOutBtn');
+
+  if (zoomInBtn && zoomOutBtn) {
+    zoomInBtn.addEventListener('click', () => {
+      const view = map.getView();
+      const zoom = view.getZoom();
+      if (zoom !== undefined) {
+        view.animate({ zoom: zoom + 1, duration: 250 }); // Zoom in con animación
+      }
+    });
+
+    zoomOutBtn.addEventListener('click', () => {
+      const view = map.getView();
+      const zoom = view.getZoom();
+      if (zoom !== undefined) {
+        view.animate({ zoom: zoom - 1, duration: 250 }); // Zoom out con animación
+      }
+    });
+  } else {
+    console.error('Botones de zoom no encontrados en el DOM. Verifica que los IDs "zoomInBtn" y "zoomOutBtn" existen.');
+  }
+});

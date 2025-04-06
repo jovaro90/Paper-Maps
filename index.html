@@ -114,10 +114,17 @@
     </header>
 
     <!-- Contenedor de la mapa -->
-    <div class="container"></div>
-    <div id="map" class="map">      
-    </div>
+    <div class="container">
+      <div id="map" class="map">
+        <!-- Los controles de zoom se agregarán automáticamente por OpenLayers -->
+      </div>
 
+      <!-- Contenedor del minimapa dentro del contenedor principal -->
+      <div id="minimapContainer" class="ol-overviewmap">
+        <!-- Este es el minimapa dentro del mapa principal -->
+        <div class="ol-overviewmap-map"></div>
+      </div>
+    </div>
     <!-- Botón para alternar la visibilidad del sidebar -->
 <button id="toggleSidebarResultsBtn">Mostrar Resultados</button>
 <button id="toggleResultsBtn">Mostrar Resultados</button>
@@ -136,9 +143,8 @@
   </div>
 </div>
 
-<!-- Contenedor del minimapa -->
-<div class="ol-overviewmap"></div>
-   
+
+
 <!-- Contenedor para el botón o menú desplegable que permita cambiar entre los mapas base -->
 <div id="baseLayerSwitcher" class="base-layer-select">
   <label for="baseLayerSelect">Seleccionar Mapa Base:</label>
@@ -155,6 +161,11 @@
     <option value="ESRI Topo">ESRI Topo</option>
     <option value="ESRI Transportation">ESRI Transportation</option>
   </select>
+</div>
+
+<div id="zoomControls" class="zoom-controls">
+  <button id="zoomInBtn" class="zoom-btn">+</button>
+  <button id="zoomOutBtn" class="zoom-btn">-</button>
 </div>
 
     <script>

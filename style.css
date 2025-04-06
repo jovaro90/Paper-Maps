@@ -108,17 +108,16 @@ html, body {
 
 /* -------------- SIDEBAR INFO ---------------------------- */
 /* Barra minimapa */
+/* Minimapa visible */
 .ol-overviewmap {
   position: absolute;
-  top: 82.5%;
-  left: 92%; /* Posición inicial en la parte derecha */
-  transform: translateX(-50%); /* Centrado del minimapa */
+  top: 80%; /* Asegúrate de que esté bien posicionado */
+  right: 100px; /* Posición inicial */
   width: 150px;
   height: 150px;
-  background: rgba(0, 0, 0, 0); /* Fondo transparente */
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  transition: left 0.3s ease-in-out; /* Transición suave al mover */
+  z-index: 2000; /* Para asegurarse de que esté sobre otros elementos */
+  transition: all 0.3s ease-in-out;  /* Transición suave */
+  visibility: visible;
 }
 
 /* Sidebar-right inicialmente oculta */
@@ -250,6 +249,7 @@ html, body {
 .ol-scale-bar {
   background-color: rgba(0, 0, 0, 0.911); /* Fondo oscuro */
   border-radius: 7px; /* Bordes redondeados */
+ 
   padding: 15px 9px; /* Espaciado interno */
   color: rgb(255, 255, 255); /* Texto blanco */
   box-shadow: 0 20px 8px rgba(0, 0, 0, 0); /* Sombra para dar profundidad */
@@ -436,7 +436,9 @@ html, body {
   background-color: rgba(0, 0, 0, 0.5); /* Fondo semitransparente */
   z-index: 10000; /* Asegura que esté por encima de otros elementos */
 }
-
+.close-btn {
+  cursor: pointer;
+}
 /* Estilo para el propio popup */
 #popupInfo {
   background-color: #000000;
@@ -879,31 +881,11 @@ html, body {
   z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
 
-/* Estilo para los controles de zoom */
+/* Eliminar estilos de los controles de zoom */
 .ol-zoom {
-  position: absolute;
-  top: 8%; /* Alineado con el LayerSwitcher */
-  left: 39.15%; /* Posicionado al lado derecho del LayerSwitcher */
-  transform: translateX(-50%);
-  z-index: 1000; /* Asegurar que esté por encima del mapa */
-  background: none; /* Elimina el fondo */
-  border: none; /* Elimina cualquier borde */
-  box-shadow: none; /* Elimina cualquier sombra */
+  display: none; /* Ocultar los controles de zoom */
 }
 
-.ol-zoom button {
-  background-color: black; /* Fondo negro */
-  color: white; /* Texto blanco */
-  border-radius: 5px;
-  padding: 5px;
-  font-size: 16px;
-  cursor: pointer;
-  margin: 10px; /* Espaciado entre botones */
-}
-
-.ol-zoom button:hover {
-  background-color: #333; /* Fondo más claro al pasar el mouse */
-}
 /* Ocultar el ícono del LayerSwitcher */
 .ol-layerswitcher {
   display: none; /* Oculta el control predeterminado */
@@ -911,5 +893,34 @@ html, body {
 
 .ol-layerswitcher {
   display: none !important; /* Asegúrate de que se aplique este estilo */
+}
+
+/* Contenedor de los botones de zoom */
+.zoom-controls {
+  position: absolute;
+  top: 8.5%; /* Alineado con el selector de mapa base */
+  left: 50%; /* Posicionado al lado del selector */
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  gap: 5px;
+}
+
+/* Botones de zoom */
+.zoom-btn {
+  background-color: black;
+  color: white;
+  border: 2px solid white;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.zoom-btn:hover {
+  background-color: #333;
+  color: #fff;
 }
 
