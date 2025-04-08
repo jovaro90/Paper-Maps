@@ -46,7 +46,7 @@ export async function addNewData(event) {
         latitud,
         longitud,
         link,
-        ubicacion: ubicacion || '',  // Permitir que los opcionales estén vacíos// Opcional
+        ubicacion: ubicacion || '',  // Opcional
         anio: anio || '',  // Opcional
         palabraclave: palabraClave || '', // Opcional
         descripcion: descripcion || '', // Opcional
@@ -109,8 +109,7 @@ export async function addNewData(event) {
 
 //--------------------------------------------------------------
 //--------------------------------------------------------------
-/*ERROR:  no se actualiza tras añadir el nuevo dato y se debe actualizar a mano
-*/
+
     //verificar datos antes de enviar
     console.log('Valores antes de enviar:', data); // Depuración adicional
 

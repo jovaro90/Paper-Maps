@@ -72,7 +72,11 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
         }));
       });
 
-      updateSidebarWithSelectedPoints(pointsInArea);
+      if (typeof updateSidebarWithSelectedPoints === 'function') {
+        updateSidebarWithSelectedPoints(pointsInArea);
+      } else {
+        console.error('La función updateSidebarWithSelectedPoints no está definida.');
+      }
     } else {
       console.warn('No se encontraron puntos dentro del área seleccionada.');
     }
@@ -92,6 +96,12 @@ export function enableAreaSelection(map, representedPoints, filteredResults) {
     }));
 
     console.log('Resultados filtrados actualizados:', selectedResults);
+
+    // Ocultar el popup al finalizar el dibujo
+    const popupContainer = document.getElementById('popupContainer');
+    if (popupContainer) {
+      popupContainer.style.display = 'none';
+    }
 
     // Mostrar los resultados en el popup usando displaySearchResults
     displaySearchResults(selectedResults);

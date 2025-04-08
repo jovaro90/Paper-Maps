@@ -94,7 +94,7 @@ export function displaySearchResults(results) {
   
   export function generateStatistics(results, selectedYear = null) {
   const statsContainer = document.getElementById('popupStatsContent');
-  statsContainer.innerHTML = ''; // Limpiar contenido previo
+  statsContainer.innerHTML = ''; 
 
   // Filtrar resultados por año si se selecciona uno
   const filteredResults = selectedYear
@@ -140,7 +140,7 @@ export function displaySearchResults(results) {
       datasets: [{
         label: `Proyectos por Temática ${selectedYear ? `en ${selectedYear}` : '(Total)'}`,
         data: themeValues,
-        backgroundColor: themeLabels.map((_, index) => `hsl(${(index * 360 / themeLabels.length)}, 70%, 50%)`), // Generar colores únicos
+        backgroundColor: themeLabels.map((_, index) => `hsl(${(index * 360 / themeLabels.length)}, 70%, 50%)`), 
       }]
     },
     options: {
@@ -195,45 +195,50 @@ export function displaySearchResults(results) {
 
   export function updateSidebarWithSelectedPoints(points) {
     const sidebar = document.getElementById('sidebarResults');
-    const resultsContainer = document.getElementById('popupResultsContent'); // Contenedor de resultados
-  
+    const resultsContainer = document.getElementById('popupResultsContent'); 
+
     if (!resultsContainer) {
-      console.error('El contenedor de resultados (popupResultsContent) no se encontró en el DOM.');
-      return;
+        console.error('El contenedor de resultados (popupResultsContent) no se encontró en el DOM.');
+        return;
     }
-  
+
     // Limpiar los resultados anteriores
     resultsContainer.innerHTML = '';
-  
+
     if (points.length === 0) {
-      resultsContainer.innerHTML = '<p>No hay puntos dentro del área seleccionada.</p>';
-      return;
+        resultsContainer.innerHTML = '<p>No hay puntos dentro del área seleccionada.</p>';
+        return;
     }
-  
+
     // Crear una lista de los puntos seleccionados
     const list = document.createElement('ul');
     points.forEach(point => {
-      const name = point.Nombre || point.get?.('name') || 'Sin nombre';
-      const description = point.descripcion || point.get?.('descripcion') || 'Sin descripción';
-      const link = point.link || point.get?.('link') || '#';
-  
-      const listItem = document.createElement('li');
-      listItem.innerHTML = `
-        <h4>${name}</h4>
-        <p>${description}</p>
-        <a href="${link}" target="_blank">Más información</a>
-      `;
-      list.appendChild(listItem);
+        const name = point.Nombre || point.get?.('name') || 'Sin nombre';
+        const description = point.descripcion || point.get?.('descripcion') || 'Sin descripción';
+        const link = point.link || point.get?.('link') || '#';
+
+        const listItem = document.createElement('li');
+        listItem.innerHTML = `
+            <h4>${name}</h4>
+            <p>${description}</p>
+            <a href="${link}" target="_blank">Más información</a>
+        `;
+        list.appendChild(listItem);
     });
-  
+
     resultsContainer.appendChild(list);
-  
+
     // Mostrar la barra lateral si está oculta
-    if (!sidebar.classList.contains('open')) {
-      sidebar.classList.add('open');
-      document.getElementById('toggleSidebarResultsBtn').textContent = 'Ocultar Resultados';
+    if (sidebar && !sidebar.classList.contains('open')) {
+        sidebar.classList.add('open');
+        const toggleButton = document.getElementById('toggleSidebarResultsBtn');
+        if (toggleButton) {
+            toggleButton.textContent = 'Ocultar Resultados';
+        } else {
+            console.warn('El botón con ID "toggleSidebarResultsBtn" no se encontró en el DOM.');
+        }
     }
-  }
+}
 
   export function toggleSidebarResults() {
     const sidebar = document.getElementById('sidebarResults');
@@ -261,7 +266,12 @@ if (typeof window !== 'undefined') {
 
 export function updateSidebarButtonState() {
     const sidebar = document.getElementById('sidebarResults');
-    const button = document.getElementById('toggleSidebarResultsBtn');
+    const toggleButton = document.getElementById('toggleSidebarResultsBtn');
+if (toggleButton) {
+  toggleButton.textContent = 'Ocultar Resultados';
+} else {
+  console.warn('El botón con ID "toggleSidebarResultsBtn" no se encontró en el DOM.');
+}
 
     if (!sidebar || !button) {
         console.error('No se encontraron los elementos con ID "sidebarResults" o "toggleSidebarResultsBtn".');

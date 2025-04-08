@@ -164,16 +164,21 @@
       function toggleSidebarResults() {
         const sidebar = document.getElementById('sidebarResults');
         const button = document.getElementById('toggleSidebarResultsBtn');
-        if (sidebar.style.display === 'none' || sidebar.style.display === '') {
-          sidebar.style.display = 'block';
-          button.textContent = 'Ocultar Resultados';
-        } else {
-          sidebar.style.display = 'none';
-          button.textContent = 'Mostrar Resultados';
+        if (sidebar && button) { // Verificación para evitar errores
+          if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+            sidebar.style.display = 'block';
+            button.textContent = 'Ocultar Resultados';
+          } else {
+            sidebar.style.display = 'none';
+            button.textContent = 'Mostrar Resultados';
+          }
         }
       }
 
-      document.getElementById('toggleSidebarResultsBtn').addEventListener('click', toggleSidebarResults);
+      const toggleButton = document.getElementById('toggleSidebarResultsBtn');
+      if (toggleButton) { // Verificación para evitar errores
+        toggleButton.addEventListener('click', toggleSidebarResults);
+      }
     </script>
 
  <!-- Popup info punto -->

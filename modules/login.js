@@ -160,7 +160,7 @@ export async function loadUsersFromCSV() {
     const username = document.getElementById('registerUsername').value.trim();
     const password = document.getElementById('registerPassword').value.trim();
     const repeatPassword = document.getElementById('repeatPassword').value.trim();
-    const role = document.getElementById('userRole').value; // Asegúrate de que este valor sea correcto
+    const role = document.getElementById('userRole').value; 
   
     if (!username || !password || !repeatPassword) {
       alert('Por favor, complete todos los campos.');

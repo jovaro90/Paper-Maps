@@ -99,7 +99,7 @@ export function setupCSVHandlers(map, displaySearchResults) {
     if (filteredResults.length > 0) {
       displaySearchResults(filteredResults); // Mostrar resultados de búsqueda
       representedPoints = []; // Reiniciar el array correctamente
-      addFilteredPointsToMap(map, filteredResults, representedPoints); // Añadir puntos al mapa
+      addFilteredPointsToMap(map, filteredResults, representedPoints); 
     }
   });
 }
@@ -153,7 +153,7 @@ export function addFilteredPointsToMap(map, filteredResults, representedPoints) 
     if (!isNaN(lat) && !isNaN(lon)) {
       const point = new Feature({
         geometry: new Point(fromLonLat([lon, lat])),
-  nombre: item.Nombre || 'Sin nombre', // Cambiar 'name' a 'nombre'
+  nombre: item.Nombre || 'Sin nombre', 
   ubicacion: item.ubicacion || 'Ubicación no disponible',
   tematica: item.tematica || 'No disponible',
   anio: item.anio || 'No disponible',
@@ -183,7 +183,7 @@ export function addFilteredPointsToMap(map, filteredResults, representedPoints) 
   const selectInteraction = new Select({ condition: click });
 
   selectInteraction.on('select', function (event) {
-    if (isSelectingArea) return; // ← evita mostrar el popup durante selección de área
+    if (isSelectingArea) return; // Evitar la selección si se está dibujando un área
   
     const selectedFeature = event.selected[0];
     if (selectedFeature) {
